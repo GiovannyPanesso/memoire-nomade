@@ -1,0 +1,51 @@
+# -----------------------------
+# .NET / Visual Studio
+# -----------------------------
+.vs/
+**/bin/
+**/obj/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.csproj.user
+*.log
+
+# -----------------------------
+# Logs
+# -----------------------------
+**/logs/
+**/*.log
+
+# -----------------------------
+# Secrets / Local config
+# -----------------------------
+**/appsettings.Development.json
+**/secrets.json
+**/.env
+**/.env.*
+
+# Keep examples tracked
+!**/appsettings.Development.example.json
+!.env.example
+
+# -----------------------------
+# Frontend (React / Node)
+# -----------------------------
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------
+# Editors / OS
+# -----------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
