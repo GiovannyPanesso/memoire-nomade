@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    color: #111827;
+    font-family: sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: Georgia, Cambria, serif;
+  }
+}
+
+@layer utilities {
+  .container-app {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
