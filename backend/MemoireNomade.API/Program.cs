@@ -94,6 +94,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // CORS -> solo permite el frontend local durante desarrollo
 builder.Services.AddCors(options =>

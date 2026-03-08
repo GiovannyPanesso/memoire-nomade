@@ -22,11 +22,17 @@ namespace MemoireNomade.API.Services
     public class BookingService : IBookingService
     {
         private readonly AppDbContext _context;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<BookingService> _logger;
 
-        public BookingService(AppDbContext context)
+        public BookingService(AppDbContext context, IEmailService emailService, ILogger<BookingService> logger)
         {
             _context = context;
+            _emailService = emailService;
+            _logger = logger;
         }
+
+
 
         // ── Públicos ──────────────────────────────────────────────────────────
 
@@ -40,6 +46,8 @@ namespace MemoireNomade.API.Services
 
         public async Task<(bool Success, string ErrorMessage, BookingDetailDto? Booking)> CreateBookingAsync(CreateBookingDto dto)
         {
+
+
             return await CreateBookingInternalAsync(
                 dto.Customer,
                 dto.Items,
@@ -275,6 +283,33 @@ namespace MemoireNomade.API.Services
             await _context.SaveChangesAsync();
 
             var result = await GetBookingByIdAsync(booking.Id);
+
+            // Enviar email de confirmación al cliente
+            try
+            {
+                var emailData = new BookingConfirmationData
+                {
+                    CustomerName = customer.Name,
+                    CustomerEmail = customer.Email,
+                    ConfirmationCode = confirmationCode,
+                    TotalAmount = totalAmount,
+                    Items = bookingItems.Select((item, index) => new BookingItemData
+                    {
+                        TourName = result!.Items[index].TourName,
+                        Date = result.Items[index].SessionDate.ToString("dd/MM/yyyy"),
+                        Time = result.Items[index].SessionTime.ToString(@"hh\:mm"),
+                        PricingLabel = result.Items[index].PricingLabel,
+                        Subtotal = item.Subtotal
+                    }).ToList()
+                };
+
+                await _emailService.SendBookingConfirmationAsync(emailData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending confirmation email for booking {Code}", confirmationCode);
+            }
+
             return (true, string.Empty, result);
         }
 
