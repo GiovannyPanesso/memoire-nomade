@@ -9,18 +9,22 @@ interface AuthStore {
   logout: () => void;
 }
 
+const storedUser = localStorage.getItem("adminUser");
+
 export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
+  user: storedUser ? (JSON.parse(storedUser) as AdminUser) : null,
   accessToken: localStorage.getItem("accessToken"),
   isAuthenticated: !!localStorage.getItem("accessToken"),
 
   login: (token, user) => {
     localStorage.setItem("accessToken", token);
+    localStorage.setItem("adminUser", JSON.stringify(user));
     set({ accessToken: token, user, isAuthenticated: true });
   },
 
   logout: () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("adminUser");
     set({ accessToken: null, user: null, isAuthenticated: false });
   },
 }));
