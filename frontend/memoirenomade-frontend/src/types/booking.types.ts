@@ -21,6 +21,17 @@ export interface CustomerInfo {
   country: string;
 }
 
+export interface BookingSummary {
+  id: number;
+  confirmationCode: string;
+  customerName: string;
+  customerEmail: string;
+  totalAmount: number;
+  status: string;
+  bookingDate: string;
+  tours: string[];
+}
+
 export interface BookingItem {
   id: number;
   sessionId: number;
@@ -38,12 +49,14 @@ export interface BookingItem {
 export interface Booking {
   id: number;
   confirmationCode: string;
+  notes?: string;
   customer: {
     id: number;
     name: string;
     email: string;
     phone: string | null;
     country: string | null;
+    notes?: string;
   };
   totalAmount: number;
   status: string;

@@ -1,5 +1,5 @@
 import api from "./api";
-import { Booking } from "@/types/booking.types";
+import { Booking, BookingSummary } from "@/types/booking.types";
 
 export const bookingService = {
   getByConfirmationCode: async (code: string): Promise<Booking> => {
@@ -18,7 +18,7 @@ export const bookingService = {
     tourId?: number;
     from?: string;
     to?: string;
-  }): Promise<Booking[]> => {
+  }): Promise<BookingSummary[]> => {
     const params = new URLSearchParams();
     if (filters?.status) params.append("status", filters.status);
     if (filters?.tourId) params.append("tourId", filters.tourId.toString());

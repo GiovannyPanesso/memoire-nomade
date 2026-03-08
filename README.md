@@ -1,14 +1,10 @@
-# Mémoire Nomade API
+# Mémoire Nomade 🗼
+
+> Full-stack web application for booking guided tours in Paris.
 
 ## 🌍 Language
 
 [🇬🇧 English](#-english) | [🇪🇸 Español](#-español)
-
-Backend API for **Mémoire Nomade**, a web platform for booking guided tours in Paris.
-
-The application allows customers to explore tours, view available sessions, make reservations, and manage bookings through a secure API.
-
-This repository currently contains the **ASP.NET Core 8 Web API backend** of the platform.
 
 ---
 
@@ -16,274 +12,310 @@ This repository currently contains the **ASP.NET Core 8 Web API backend** of the
 
 ## Overview
 
-Mémoire Nomade is a **full-stack web application** designed to manage and book guided tours in Paris.
+**Mémoire Nomade** is a full-stack web application that allows customers to explore, book, and manage guided tours in Paris. It includes a complete public-facing website and a private admin panel.
 
-The platform allows customers to:
+### Live Demo
 
-- Explore available tours
-- View available sessions
-- Book tours online
-- Contact the tour provider
-- Manage reservations
-
-Administrators can:
-
-- Manage tours and sessions
-- Manage reservations
-- Access dashboard metrics
-- Manage admin users
-- Review customer messages
-
-This repository contains the **backend API built with ASP.NET Core 8**.
+> 🚧 Coming soon — deployment in progress.
 
 ---
 
-## Tech Stack
+## ✨ Features
+
+### Public Website
+
+- 🗺️ Browse available tours with gallery and details
+- 📅 View available sessions with pricing
+- 🛒 Cart system with multi-tour booking
+- 💳 Secure payment with Stripe
+- 📧 Contact form
+- ✅ Booking confirmation with unique MN code
+
+### Admin Panel
+
+- 📊 Dashboard with key metrics
+- 🗺️ Full tour management (CRUD + featured + images)
+- 📅 Session management with pricing tiers
+- 📋 Booking management with status history
+- 💰 Real Stripe refunds
+- 💬 Customer messages inbox
+- 👥 Admin user management
+
+---
+
+## 🛠️ Tech Stack
 
 ### Backend
 
-- ASP.NET Core 8 Web API
-- Entity Framework Core 8 (Code First)
-- SQL Server
-- JWT Authentication
-- Refresh Token system
-- Swagger / OpenAPI
-- Serilog logging
-
-### Planned Integrations
-
-- Stripe Payments
-- PayPal Payments
-- SendGrid Email service
-- React + TypeScript frontend
-
----
-
-## Current Development Phase
-
-### Phase 1 — Backend Base
-
-Implemented:
-
-- ASP.NET Core Web API project
-- Entity Framework Core configuration
-- Initial domain models
-- Database context (DbContext)
-- Initial database migrations
-- Swagger API documentation
-
----
-
-### Phase 2 — Core Backend Features
-
-Implemented features:
-
-#### Tours
-
-- Public tours endpoints
-- Admin CRUD operations for tours
-- Tour images support
-- Featured tours management
-
-#### Sessions
-
-- Public sessions endpoints
-- Admin CRUD for sessions
-- Session status management
-- Session pricing
-
-#### Reservations
-
-- Public reservation creation
-- Admin reservation management
-- Unique booking code generation (MN code)
-- Reservation history
-
-#### Contact System
-
-- Public contact form
-- Admin message management
-
-#### Admin Dashboard
-
-- Dashboard metrics for reservations and activity
-
-#### Admin Users
-
-- CRUD management for admin users
-- Custom admin credentials
-
-#### Authentication
-
-- JWT authentication
-- Refresh token system
-
----
-
-## Phase 3 — Planned Features
-
-Future improvements include:
-
-### Payments
-
-- Stripe integration
-- PayPal integration
-
-### Email Notifications
-
-- Booking confirmation emails
-- SendGrid integration
+| Technology              | Purpose            |
+| ----------------------- | ------------------ |
+| ASP.NET Core 8          | REST API           |
+| Entity Framework Core 8 | ORM / Code First   |
+| SQL Server              | Database           |
+| JWT + Refresh Tokens    | Authentication     |
+| Stripe.net              | Payments & Refunds |
+| Serilog                 | Logging            |
+| Swagger / OpenAPI       | API Documentation  |
 
 ### Frontend
 
-- React + TypeScript frontend
-- Admin dashboard interface
+| Technology               | Purpose            |
+| ------------------------ | ------------------ |
+| React 18 + TypeScript    | UI Framework       |
+| Vite                     | Build Tool         |
+| Tailwind CSS v4          | Styling            |
+| React Router v6          | Routing            |
+| Zustand                  | State Management   |
+| React Hook Form + Zod    | Forms & Validation |
+| Axios                    | HTTP Client        |
+| Stripe.js + React Stripe | Payment UI         |
+| Lucide React             | Icons              |
 
 ---
 
-## Authentication
-
-The API uses **JWT authentication**.
-
-Protected endpoints require a valid access token in the request header.
-
-Example:
+## 🏗️ Project Structure
 
 ```
-Authorization: Bearer {access_token}
+memoire-nomade/
+├── backend/
+│   └── MemoireNomade.API/
+│       ├── Controllers/
+│       │   ├── Admin/          # Protected admin endpoints
+│       │   ├── AuthController
+│       │   ├── BookingsController
+│       │   ├── ContactController
+│       │   ├── PaymentController
+│       │   ├── SessionsController
+│       │   └── ToursController
+│       ├── Data/               # DbContext + Factory
+│       ├── DTOs/               # Data Transfer Objects
+│       ├── Middleware/         # Custom middleware
+│       ├── Migrations/         # EF Core migrations
+│       ├── Models/             # Domain models
+│       ├── Services/           # Business logic
+│       └── Program.cs
+│
+└── frontend/
+    └── memoirenomade-frontend/
+        └── src/
+            ├── components/     # Reusable UI components
+            ├── pages/
+            │   ├── admin/      # Admin panel pages
+            │   └── (public)    # Public website pages
+            ├── services/       # API + Stripe services
+            ├── store/          # Zustand stores
+            ├── types/          # TypeScript interfaces
+            └── utils/          # Formatters & helpers
 ```
-
-The system also supports **refresh tokens** to renew expired access tokens.
 
 ---
 
-## API Endpoints
+## 🚀 Getting Started
 
-Below are some of the main endpoints exposed by the API.
+### Prerequisites
+
+- .NET 8 SDK
+- Node.js 18+
+- SQL Server
+- Stripe account (for payments)
+
+### Backend Setup
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/GiovannyPanesso/memoire-nomade.git
+cd memoire-nomade/backend/MemoireNomade.API
+```
+
+**2. Configure settings**
+
+Copy the example config file:
+
+```bash
+cp appsettings.Development.example.json appsettings.Development.json
+```
+
+Update `appsettings.Development.json` with your values:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=YOUR_SERVER;Database=MemoireNomadeDB;Trusted_Connection=True;TrustServerCertificate=True"
+  },
+  "JwtSettings": {
+    "SecretKey": "your-secret-key-min-32-chars",
+    "Issuer": "MemoireNomade.API",
+    "Audience": "MemoireNomade.Frontend",
+    "ExpirationHours": 8
+  },
+  "RefreshTokenSettings": {
+    "ExpirationDays": 30
+  },
+  "Stripe": {
+    "SecretKey": "sk_test_YOUR_KEY",
+    "PublishableKey": "pk_test_YOUR_KEY",
+    "WebhookSecret": "whsec_YOUR_SECRET"
+  }
+}
+```
+
+**3. Run migrations**
+
+```bash
+dotnet ef database update
+```
+
+**4. Start the API**
+
+```bash
+dotnet run
+```
+
+Swagger available at: `http://localhost:5200/swagger`
+
+Default admin credentials (seeded):
+
+- Email: `admin@memoirenomade.com`
+- Password: `Admin1234`
+
+---
+
+### Frontend Setup
+
+**1. Navigate to frontend**
+
+```bash
+cd memoire-nomade/frontend/memoirenomade-frontend
+```
+
+**2. Install dependencies**
+
+```bash
+npm install
+```
+
+**3. Configure environment**
+
+Create `.env` in the frontend root:
+
+```
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_KEY
+```
+
+**4. Start dev server**
+
+```bash
+npm run dev
+```
+
+App available at: `http://localhost:5173`
+
+---
+
+### Stripe Webhooks (Local Development)
+
+Install [Stripe CLI](https://stripe.com/docs/stripe-cli) and run:
+
+```bash
+stripe listen --forward-to http://localhost:5200/api/payments/webhook
+```
+
+Copy the `whsec_` secret to your `appsettings.Development.json`.
+
+---
+
+## 📡 API Endpoints
 
 ### Authentication
 
 ```
 POST /api/auth/login
-POST /api/auth/refresh-token
+POST /api/auth/refresh
 POST /api/auth/logout
 ```
 
-### Tours
+### Public
 
 ```
-GET    /api/tours
-GET    /api/tours/{id}
+GET  /api/tours
+GET  /api/tours/featured
+GET  /api/tours/{id}
+GET  /api/tours/{id}/sessions
+POST /api/bookings
+GET  /api/bookings/{confirmationCode}
+POST /api/contact
+```
+
+### Admin (JWT required)
+
+```
+GET    /api/admin/dashboard
+GET    /api/admin/tours
 POST   /api/admin/tours
 PUT    /api/admin/tours/{id}
 DELETE /api/admin/tours/{id}
-```
-
-### Sessions
-
-```
-GET    /api/sessions
-GET    /api/sessions/{id}
+GET    /api/admin/sessions
 POST   /api/admin/sessions
 PUT    /api/admin/sessions/{id}
 DELETE /api/admin/sessions/{id}
+GET    /api/admin/bookings
+GET    /api/admin/bookings/{id}
+PUT    /api/admin/bookings/{id}
+POST   /api/admin/bookings/{id}/refund
+GET    /api/admin/messages
+PUT    /api/admin/messages/{id}/read
+DELETE /api/admin/messages/{id}
+GET    /api/admin/users
+POST   /api/admin/users
+PUT    /api/admin/users/{id}
+PUT    /api/admin/users/me/credentials
 ```
 
-### Reservations
+### Payments
 
 ```
-POST   /api/reservations
-GET    /api/admin/reservations
-GET    /api/admin/reservations/{id}
-PUT    /api/admin/reservations/{id}
-DELETE /api/admin/reservations/{id}
-```
-
-### Contact
-
-```
-POST /api/contact
-GET  /api/admin/messages
-```
-
-### Admin Dashboard
-
-```
-GET /api/admin/dashboard/metrics
-```
-
-Full API documentation is available via **Swagger** when running the project locally.
-
----
-
-## Project Structure
-
-```
-backend/MemoireNomade.API
-
-Controllers/
-Data/
-DTOs/
-Migrations/
-Models/
-Services/
-Middleware/
-
-Program.cs
-appsettings.json
+POST /api/payments/create-payment-intent
+POST /api/payments/webhook
 ```
 
 ---
 
-## Running the Project
+## 🔐 Security
 
-### 1 Clone the repository
+- JWT access tokens (8h expiry)
+- HTTP-only cookies for refresh tokens (30d)
+- Refresh token rotation on each use
+- CORS restricted to frontend origin
+- Passwords hashed with ASP.NET Identity PasswordHasher
+- Stripe webhook signature verification
 
-```
-git clone https://github.com/GiovannyPanesso/memoire-nomade.git
-```
+---
 
-### 2 Configure the database
+## 📋 Development Phases
 
-Copy the configuration template:
+- [x] Phase 1 — Backend base (models, EF Core, migrations, auth)
+- [x] Phase 2 — Backend features (tours, sessions, bookings, contact, dashboard)
+- [x] Phase 3 — Frontend public website
+- [x] Phase 4 — Admin panel
+- [x] Phase 5 — Stripe payments & refunds
+- [ ] Phase 6 — SendGrid email notifications
+- [ ] Phase 7 — Deployment
 
-```
-appsettings.Development.example.json
-```
+---
 
-Rename it to:
+## 👨‍💻 Author
 
-```
-appsettings.Development.json
-```
+**Giovanny Panesso**
 
-Then update the SQL Server connection string.
+Full-stack development project built to practice and demonstrate skills in:
 
-Example:
-
-```
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Database=MemoireNomadeDB;Trusted_Connection=True;TrustServerCertificate=True;"
-}
-```
-
-### 3 Run database migrations
-
-```
-dotnet ef database update
-```
-
-### 4 Run the API
-
-```
-dotnet run
-```
-
-Swagger documentation will be available at:
-
-```
-https://localhost:5001/swagger
-```
+- .NET 8 / ASP.NET Core
+- React + TypeScript
+- SQL Server / Entity Framework Core
+- Stripe payment integration
+- JWT authentication systems
+- REST API design
 
 ---
 
@@ -291,258 +323,124 @@ https://localhost:5001/swagger
 
 ## Descripción
 
-Mémoire Nomade es una **aplicación web full stack** diseñada para la gestión y reserva de tours turísticos en París.
-
-La plataforma permite a los clientes:
-
-- Explorar tours disponibles
-- Consultar sesiones disponibles
-- Realizar reservas online
-- Contactar con el proveedor de tours
-- Gestionar sus reservas
-
-Los administradores pueden:
-
-- Gestionar tours y sesiones
-- Gestionar reservas
-- Consultar métricas en el dashboard
-- Gestionar usuarios administradores
-- Revisar mensajes de clientes
-
-Este repositorio contiene el **backend desarrollado con ASP.NET Core 8 Web API**.
+**Mémoire Nomade** es una aplicación web full stack para la gestión y reserva de tours turísticos en París. Incluye un sitio web público y un panel de administración privado.
 
 ---
 
-## Stack tecnológico
+## ✨ Funcionalidades
+
+### Sitio Web Público
+
+- 🗺️ Explorar tours disponibles con galería y detalles
+- 📅 Consultar sesiones disponibles con tarifas
+- 🛒 Carrito con reserva de múltiples tours
+- 💳 Pago seguro con Stripe
+- 📧 Formulario de contacto
+- ✅ Confirmación de reserva con código MN único
+
+### Panel de Administración
+
+- 📊 Dashboard con métricas clave
+- 🗺️ Gestión completa de tours (CRUD + destacados + imágenes)
+- 📅 Gestión de sesiones con tarifas múltiples
+- 📋 Gestión de reservas con historial de estados
+- 💰 Reembolsos reales con Stripe
+- 💬 Bandeja de mensajes de clientes
+- 👥 Gestión de usuarios administradores
+
+---
+
+## 🛠️ Stack Tecnológico
 
 ### Backend
 
-- ASP.NET Core 8 Web API
-- Entity Framework Core 8 (Code First)
-- SQL Server
-- Autenticación JWT
-- Sistema de Refresh Tokens
-- Swagger / OpenAPI
-- Logging con Serilog
-
-### Integraciones previstas
-
-- Stripe
-- PayPal
-- SendGrid
-- Frontend con React + TypeScript
-
----
-
-## Estado actual del proyecto
-
-### Fase 1 — Base del Backend
-
-Implementado:
-
-- Proyecto ASP.NET Core Web API
-- Configuración de Entity Framework Core
-- Modelos iniciales del dominio
-- DbContext
-- Migraciones iniciales de base de datos
-- Documentación de la API con Swagger
-
----
-
-### Fase 2 — Funcionalidades principales del backend
-
-Funcionalidades implementadas:
-
-#### Tours
-
-- Endpoints públicos de tours
-- CRUD de tours para administradores
-- Gestión de imágenes de tours
-- Tours destacados
-
-#### Sesiones
-
-- Endpoints públicos de sesiones
-- CRUD de sesiones para administradores
-- Gestión del estado de las sesiones
-- Gestión de precios
-
-#### Reservas
-
-- Creación pública de reservas
-- Gestión de reservas para administradores
-- Generación de código único de reserva (MN code)
-- Historial de reservas
-
-#### Sistema de contacto
-
-- Formulario público de contacto
-- Gestión de mensajes para administradores
-
-#### Dashboard de administración
-
-- Métricas de reservas y actividad
-
-#### Usuarios administradores
-
-- CRUD de usuarios administradores
-- Gestión de credenciales
-
-#### Autenticación
-
-- Autenticación JWT
-- Sistema de Refresh Tokens
-
----
-
-## Fase 3 — Funcionalidades previstas
-
-Mejoras futuras:
-
-### Pagos
-
-- Integración con Stripe
-- Integración con PayPal
-
-### Notificaciones por correo
-
-- Confirmación de reservas por email
-- Integración con SendGrid
+| Tecnología              | Uso                |
+| ----------------------- | ------------------ |
+| ASP.NET Core 8          | REST API           |
+| Entity Framework Core 8 | ORM / Code First   |
+| SQL Server              | Base de datos      |
+| JWT + Refresh Tokens    | Autenticación      |
+| Stripe.net              | Pagos y reembolsos |
+| Serilog                 | Logging            |
+| Swagger / OpenAPI       | Documentación API  |
 
 ### Frontend
 
-- Aplicación React + TypeScript
-- Dashboard administrativo
+| Tecnología               | Uso                      |
+| ------------------------ | ------------------------ |
+| React 18 + TypeScript    | Framework UI             |
+| Vite                     | Herramienta de build     |
+| Tailwind CSS v4          | Estilos                  |
+| React Router v6          | Enrutamiento             |
+| Zustand                  | Estado global            |
+| React Hook Form + Zod    | Formularios y validación |
+| Axios                    | Cliente HTTP             |
+| Stripe.js + React Stripe | UI de pagos              |
+| Lucide React             | Iconos                   |
 
 ---
 
-## Endpoints de la API
+## 🚀 Instalación
 
-A continuación se muestran algunos de los principales endpoints expuestos por la API.
+### Requisitos previos
 
-### Autenticación
+- .NET 8 SDK
+- Node.js 18+
+- SQL Server
+- Cuenta de Stripe (para pagos)
 
-```
-POST /api/auth/login
-POST /api/auth/refresh-token
-POST /api/auth/logout
-```
+### Backend
 
-### Tours
-
-```
-GET    /api/tours
-GET    /api/tours/{id}
-POST   /api/admin/tours
-PUT    /api/admin/tours/{id}
-DELETE /api/admin/tours/{id}
-```
-
-### Sesiones
-
-```
-GET    /api/sessions
-GET    /api/sessions/{id}
-POST   /api/admin/sessions
-PUT    /api/admin/sessions/{id}
-DELETE /api/admin/sessions/{id}
-```
-
-### Reservas
-
-```
-POST   /api/reservations
-GET    /api/admin/reservations
-GET    /api/admin/reservations/{id}
-PUT    /api/admin/reservations/{id}
-DELETE /api/admin/reservations/{id}
-```
-
-### Contacto
-
-```
-POST /api/contact
-GET  /api/admin/messages
-```
-
-### Dashboard de administración
-
-```
-GET /api/admin/dashboard/metrics
-```
-
-La documentación completa de la API está disponible en **Swagger** al ejecutar el proyecto localmente.
-
----
-
-## Estructura del proyecto
-
-```
-backend/MemoireNomade.API
-
-Controllers/
-Data/
-DTOs/
-Migrations/
-Models/
-Services/
-Middleware/
-
-Program.cs
-appsettings.json
-```
-
----
-
-## Ejecución del proyecto
-
-### 1 Clonar el repositorio
-
-```
+```bash
 git clone https://github.com/GiovannyPanesso/memoire-nomade.git
-```
-
-### 2 Configurar la base de datos
-
-Copiar el archivo:
-
-```
-appsettings.Development.example.json
-```
-
-Renombrarlo a:
-
-```
-appsettings.Development.json
-```
-
-Actualizar la cadena de conexión con tu instancia de SQL Server.
-
-### 3 Ejecutar migraciones
-
-```
+cd memoire-nomade/backend/MemoireNomade.API
+cp appsettings.Development.example.json appsettings.Development.json
+# Editar appsettings.Development.json con tus valores
 dotnet ef database update
-```
-
-### 4 Ejecutar la API
-
-```
 dotnet run
 ```
 
-La documentación Swagger estará disponible en:
+Swagger disponible en: `http://localhost:5200/swagger`
 
+Credenciales admin por defecto:
+
+- Email: `admin@memoirenomade.com`
+- Contraseña: `Admin1234`
+
+### Frontend
+
+```bash
+cd memoire-nomade/frontend/memoirenomade-frontend
+npm install
+# Crear .env con VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
+npm run dev
 ```
-https://localhost:5001/swagger
-```
+
+App disponible en: `http://localhost:5173`
 
 ---
 
-## Author
+## 📋 Fases de desarrollo
 
-Personal full-stack development project created to practice modern technologies such as:
+- [x] Fase 1 — Base del backend (modelos, EF Core, migraciones, auth)
+- [x] Fase 2 — Funcionalidades backend (tours, sesiones, reservas, contacto, dashboard)
+- [x] Fase 3 — Frontend sitio web público
+- [x] Fase 4 — Panel de administración
+- [x] Fase 5 — Pagos y reembolsos con Stripe
+- [ ] Fase 6 — Notificaciones por email con SendGrid
+- [ ] Fase 7 — Despliegue
 
-- .NET 8
-- React
-- TypeScript
-- SQL Server
+---
+
+## 👨‍💻 Autor
+
+**Giovanny Panesso**
+
+Proyecto de desarrollo full stack creado para practicar y demostrar habilidades en:
+
+- .NET 8 / ASP.NET Core
+- React + TypeScript
+- SQL Server / Entity Framework Core
+- Integración de pagos con Stripe
+- Sistemas de autenticación JWT
+- Diseño de APIs REST

@@ -19,6 +19,8 @@ import AdminSessions from "@/pages/admin/AdminSessions";
 import AdminBookings from "@/pages/admin/AdminBookings";
 import AdminMessages from "@/pages/admin/AdminMessages";
 import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminLayout from "./components/AdminLayout";
+import AdminTourForm from "./pages/admin/AdminTourForm";
 
 function App() {
   return (
@@ -40,14 +42,81 @@ function App() {
 
         {/* ── Rutas admin (sin Navbar público) ───────────────── */}
         <Route path="/admin/login" element={<Login />} />
+
         <Route path="/admin" element={<ProtectedRoute />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="tours" element={<AdminTours />} />
-          <Route path="sessions" element={<AdminSessions />} />
-          <Route path="bookings" element={<AdminBookings />} />
-          <Route path="messages" element={<AdminMessages />} />
-          <Route path="users" element={<AdminUsers />} />
+
+          <Route
+            path="dashboard"
+            element={
+              <AdminLayout>
+                <Dashboard />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="tours"
+            element={
+              <AdminLayout>
+                <AdminTours />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="tours/new"
+            element={
+              <AdminLayout>
+                <AdminTourForm />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="tours/:id/edit"
+            element={
+              <AdminLayout>
+                <AdminTourForm />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="sessions"
+            element={
+              <AdminLayout>
+                <AdminSessions />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="bookings"
+            element={
+              <AdminLayout>
+                <AdminBookings />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="messages"
+            element={
+              <AdminLayout>
+                <AdminMessages />
+              </AdminLayout>
+            }
+          />
+
+          <Route
+            path="users"
+            element={
+              <AdminLayout>
+                <AdminUsers />
+              </AdminLayout>
+            }
+          />
         </Route>
 
         {/* ── 404 ────────────────────────────────────────────── */}
