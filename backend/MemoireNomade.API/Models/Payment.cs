@@ -27,6 +27,8 @@ namespace MemoireNomade.API.Models
         [MaxLength(200)]
         public string? PaypalOrderId { get; set; }
 
+        public string? PayPalCaptureId { get; set; }
+
         [Required]
         [MaxLength(50)]
         public string Status { get; set; } = string.Empty;
