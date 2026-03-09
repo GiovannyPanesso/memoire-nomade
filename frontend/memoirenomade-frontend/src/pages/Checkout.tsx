@@ -11,6 +11,7 @@ import { stripeService } from "@/services/stripeService";
 import ProgressBar from "@/components/ProgressBar";
 import OrderSummary from "@/components/OrderSummary";
 import StripePaymentForm from "@/components/StripePaymentForm";
+import PayPalPaymentForm from "@/components/PayPalPaymentForm";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -32,6 +33,9 @@ export default function Checkout() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal">(
+    "stripe",
+  );
 
   useEffect(() => {
     if (items.length === 0 && !isProcessing) {
@@ -215,8 +219,8 @@ export default function Checkout() {
               </div>
             )}
 
-            {/* Paso 2: Pago con Stripe */}
-            {step === 2 && clientSecret && (
+            {/* Paso 2: Pago */}
+            {step === 2 && confirmationCode && (
               <div className="bg-white rounded-2xl shadow-sm p-8">
                 <h2 className="text-2xl font-serif font-bold text-[#1a1a2e] mb-2">
                   Pago seguro
@@ -228,32 +232,82 @@ export default function Checkout() {
                   </span>
                 </p>
 
+                {/* Selector método de pago */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <button
+                    onClick={() => setPaymentMethod("stripe")}
+                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                      paymentMethod === "stripe"
+                        ? "border-yellow-400 bg-yellow-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="text-2xl">💳</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Tarjeta de crédito
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      Visa, Mastercard...
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => setPaymentMethod("paypal")}
+                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                      paymentMethod === "paypal"
+                        ? "border-yellow-400 bg-yellow-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="text-2xl">🅿️</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      PayPal
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      Pago con cuenta PayPal
+                    </span>
+                  </button>
+                </div>
+
                 {paymentError && (
                   <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-5">
                     <p className="text-red-600 text-sm">{paymentError}</p>
                   </div>
                 )}
 
-                <Elements
-                  stripe={stripePromise}
-                  options={{
-                    clientSecret,
-                    appearance: {
-                      theme: "stripe",
-                      variables: {
-                        colorPrimary: "#c9a84c",
-                        borderRadius: "12px",
+                {/* Stripe */}
+                {paymentMethod === "stripe" && clientSecret && (
+                  <Elements
+                    stripe={stripePromise}
+                    options={{
+                      clientSecret,
+                      appearance: {
+                        theme: "stripe",
+                        variables: {
+                          colorPrimary: "#c9a84c",
+                          borderRadius: "12px",
+                        },
                       },
-                    },
-                  }}
-                >
-                  <StripePaymentForm
+                    }}
+                  >
+                    <StripePaymentForm
+                      amount={totalAmount()}
+                      confirmationCode={confirmationCode}
+                      onSuccess={handlePaymentSuccess}
+                      onError={handlePaymentError}
+                    />
+                  </Elements>
+                )}
+
+                {/* PayPal */}
+                {paymentMethod === "paypal" && (
+                  <PayPalPaymentForm
                     amount={totalAmount()}
-                    confirmationCode={confirmationCode!}
+                    confirmationCode={confirmationCode}
                     onSuccess={handlePaymentSuccess}
                     onError={handlePaymentError}
                   />
-                </Elements>
+                )}
 
                 <button
                   onClick={() => {
