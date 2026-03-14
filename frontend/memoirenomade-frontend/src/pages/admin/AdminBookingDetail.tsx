@@ -110,26 +110,28 @@ export default function AdminBookingDetail({
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Cabecera */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onBack}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <div>
-          <h1 className="text-2xl font-serif font-bold text-[#1a1a2e]">
-            Reserva{" "}
-            <span className="font-mono text-yellow-600">
-              {booking.confirmationCode}
-            </span>
-          </h1>
-          <p className="text-gray-500 text-sm mt-0.5">
-            Realizada el {formatDate(booking.bookingDate.split("T")[0])}
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all shrink-0"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#1a1a2e]">
+              Reserva{" "}
+              <span className="font-mono text-yellow-600">
+                {booking.confirmationCode}
+              </span>
+            </h1>
+            <p className="text-gray-500 text-sm mt-0.5">
+              Realizada el {formatDate(booking.bookingDate.split("T")[0])}
+            </p>
+          </div>
         </div>
         <span
-          className={`ml-auto text-sm font-semibold px-4 py-1.5 rounded-full ${
+          className={`sm:ml-auto text-sm font-semibold px-4 py-1.5 rounded-full self-start sm:self-auto ${
             statusColors[booking.status] ?? "bg-gray-100 text-gray-600"
           }`}
         >

@@ -10,6 +10,9 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
+    port: 5173,
+    allowedHosts: ["ike-brimless-unannoyingly.ngrok-free.dev"],
     proxy: {
       // Redirige las llamadas /api al backend durante desarrollo
       "/api": {

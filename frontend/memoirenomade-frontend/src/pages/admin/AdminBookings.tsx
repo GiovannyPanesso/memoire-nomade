@@ -22,7 +22,6 @@ export default function AdminBookings() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
-  // Filtros
   const [filterStatus, setFilterStatus] = useState("");
   const [filterTourId, setFilterTourId] = useState("");
   const [filterFrom, setFilterFrom] = useState("");
@@ -125,11 +124,11 @@ export default function AdminBookings() {
       )}
 
       {/* Filtros */}
-      <div className="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3">
+      <div className="bg-white rounded-2xl shadow-sm p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
+          className="w-full px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
         >
           <option value="">Todos los estados</option>
           <option value="Pendiente">Pendiente</option>
@@ -142,7 +141,7 @@ export default function AdminBookings() {
         <select
           value={filterTourId}
           onChange={(e) => setFilterTourId(e.target.value)}
-          className="px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
+          className="w-full px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
         >
           <option value="">Todos los tours</option>
           {tours.map((t) => (
@@ -156,147 +155,136 @@ export default function AdminBookings() {
           type="date"
           value={filterFrom}
           onChange={(e) => setFilterFrom(e.target.value)}
-          className="px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
-          placeholder="Desde"
+          className="w-full px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
         />
 
         <input
           type="date"
           value={filterTo}
           onChange={(e) => setFilterTo(e.target.value)}
-          className="px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
-          placeholder="Hasta"
+          className="w-full px-4 py-2 rounded-xl border-2 border-gray-200 focus:border-yellow-400 outline-none text-sm"
         />
 
         <button
           onClick={fetchBookings}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-[#1a1a2e] font-semibold rounded-xl transition-all text-sm"
+          className="sm:col-span-2 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-[#1a1a2e] font-semibold rounded-xl transition-all text-sm"
         >
           <RefreshCw size={14} />
           Filtrar
         </button>
       </div>
 
-      {/* Tabla */}
+      {/* Lista */}
       {bookings.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
           <p className="text-gray-400">No hay reservas que mostrar.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Código
-                  </th>
-                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Cliente
-                  </th>
-                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Tours
-                  </th>
-                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Fecha reserva
-                  </th>
-                  <th className="text-right px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Importe
-                  </th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Estado
-                  </th>
-                  <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {bookings.map((booking) => (
-                  <tr
-                    key={booking.id}
-                    className="hover:bg-gray-50 transition-colors"
+        <>
+          {/* Vista móvil */}
+          <div className="md:hidden space-y-3">
+            {bookings.map((booking) => (
+              <div
+                key={booking.id}
+                className="bg-white rounded-2xl shadow-sm p-4 space-y-3"
+              >
+                <div className="flex justify-between items-start">
+                  <span className="font-mono text-xs font-bold text-yellow-600">
+                    {booking.confirmationCode}
+                  </span>
+
+                  <span
+                    className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                      statusColors[booking.status] ??
+                      "bg-gray-100 text-gray-600"
+                    }`}
                   >
-                    {/* Código */}
-                    <td className="px-6 py-4">
-                      <span className="font-mono text-xs font-bold text-yellow-600">
-                        {booking.confirmationCode}
-                      </span>
-                    </td>
+                    {booking.status}
+                  </span>
+                </div>
 
-                    {/* Cliente */}
-                    <td className="px-4 py-4">
-                      <p className="text-sm font-medium text-[#1a1a2e]">
-                        {booking.customerName}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {booking.customerEmail}
-                      </p>
-                    </td>
+                <div>
+                  <p className="text-sm font-medium text-[#1a1a2e]">
+                    {booking.customerName}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {booking.customerEmail}
+                  </p>
+                </div>
 
-                    {/* Tours */}
-                    <td className="px-4 py-4">
-                      {booking.tours?.map((tourName, i) => (
-                        <p
-                          key={i}
-                          className="text-xs text-gray-600 line-clamp-1"
-                        >
-                          {tourName}
-                        </p>
-                      ))}
-                    </td>
+                <div className="text-xs text-gray-600">
+                  {booking.tours?.map((tourName, i) => (
+                    <p key={i}>{tourName}</p>
+                  ))}
+                </div>
 
-                    {/* Fecha */}
-                    <td className="px-4 py-4">
-                      <p className="text-sm text-gray-600">
-                        {formatDate(booking.bookingDate.split("T")[0])}
-                      </p>
-                    </td>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                  <div>
+                    <p className="text-xs text-gray-400">
+                      {formatDate(booking.bookingDate.split("T")[0])}
+                    </p>
+                    <p className="font-bold text-[#1a1a2e]">
+                      {formatPrice(booking.totalAmount)}
+                    </p>
+                  </div>
 
-                    {/* Importe */}
-                    <td className="px-4 py-4 text-right">
-                      <span className="font-bold text-[#1a1a2e]">
-                        {formatPrice(booking.totalAmount)}
-                      </span>
-                    </td>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleViewDetail(booking.id)}
+                      className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                    >
+                      <Eye size={16} />
+                    </button>
 
-                    {/* Estado */}
-                    <td className="px-4 py-4 text-center">
-                      <span
-                        className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                          statusColors[booking.status] ??
-                          "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </td>
-
-                    {/* Acciones */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleViewDetail(booking.id)}
-                          className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Ver detalle"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <a
-                          href={`mailto:${booking.customerEmail}`}
-                          className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-all"
-                          title="Enviar email"
-                        >
-                          <Mail size={16} />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <a
+                      href={`mailto:${booking.customerEmail}`}
+                      className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-all"
+                    >
+                      <Mail size={16} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* Vista escritorio */}
+          <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <tbody className="divide-y divide-gray-50">
+                  {bookings.map((booking) => (
+                    <tr key={booking.id}>
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-xs font-bold text-yellow-600">
+                          {booking.confirmationCode}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleViewDetail(booking.id)}
+                            className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                          >
+                            <Eye size={16} />
+                          </button>
+
+                          <a
+                            href={`mailto:${booking.customerEmail}`}
+                            className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-all"
+                          >
+                            <Mail size={16} />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

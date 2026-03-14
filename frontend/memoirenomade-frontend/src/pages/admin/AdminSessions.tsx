@@ -192,128 +192,203 @@ export default function AdminSessions() {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Tour
-                  </th>
-                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Fecha y hora
-                  </th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Plazas
-                  </th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Estado
-                  </th>
-                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Tarifas
-                  </th>
-                  <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {sessions.map((session) => (
-                  <tr
-                    key={session.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    {/* Tour */}
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-[#1a1a2e] text-sm">
-                        {session.tourName}
-                      </p>
-                      {session.includesSeineCruise && (
-                        <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-                          Crucero Sena
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Fecha y hora */}
-                    <td className="px-4 py-4">
-                      <p className="text-sm text-gray-700">
-                        {formatDate(session.date)}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {formatTime(session.time)}
-                      </p>
-                    </td>
-
-                    {/* Plazas */}
-                    <td className="px-4 py-4 text-center">
-                      <span className="text-sm font-semibold text-gray-700">
-                        {session.availableSpots}
+        <>
+          {/* Vista móvil — tarjetas */}
+          <div className="md:hidden space-y-3">
+            {sessions.map((session) => (
+              <div
+                key={session.id}
+                className="bg-white rounded-2xl shadow-sm p-4 space-y-3"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold text-[#1a1a2e] text-sm">
+                      {session.tourName}
+                    </p>
+                    {session.includesSeineCruise && (
+                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                        Crucero Sena
                       </span>
-                    </td>
+                    )}
+                  </div>
+                  <select
+                    value={session.status}
+                    onChange={(e) =>
+                      handleStatusChange(session.id, e.target.value)
+                    }
+                    className={`text-xs font-semibold px-3 py-1 rounded-full border-0 cursor-pointer outline-none ${
+                      statusColors[session.status] ??
+                      "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    <option value="Activa">Activa</option>
+                    <option value="Completada">Completada</option>
+                    <option value="Cancelada">Cancelada</option>
+                  </select>
+                </div>
 
-                    {/* Estado */}
-                    <td className="px-4 py-4 text-center">
-                      <select
-                        value={session.status}
-                        onChange={(e) =>
-                          handleStatusChange(session.id, e.target.value)
-                        }
-                        className={`text-xs font-semibold px-3 py-1 rounded-full border-0 cursor-pointer outline-none ${
-                          statusColors[session.status] ??
-                          "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        <option value="Activa">Activa</option>
-                        <option value="Completada">Completada</option>
-                        <option value="Cancelada">Cancelada</option>
-                      </select>
-                    </td>
+                <div className="flex gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-700">{formatDate(session.date)}</p>
+                    <p className="text-xs text-gray-400">
+                      {formatTime(session.time)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-700 font-semibold">
+                      {session.availableSpots}
+                    </p>
+                    <p className="text-xs text-gray-400">plazas</p>
+                  </div>
+                </div>
 
-                    {/* Tarifas */}
-                    <td className="px-4 py-4">
-                      <div className="space-y-0.5">
-                        {session.pricings.slice(0, 2).map((p) => (
-                          <p key={p.id} className="text-xs text-gray-500">
-                            {p.label}:{" "}
-                            <span className="font-semibold">
-                              {formatPrice(p.price)}
-                            </span>
-                          </p>
-                        ))}
-                        {session.pricings.length > 2 && (
-                          <p className="text-xs text-gray-400">
-                            +{session.pricings.length - 2} más
-                          </p>
-                        )}
-                      </div>
-                    </td>
+                <div className="space-y-0.5">
+                  {session.pricings.slice(0, 2).map((p) => (
+                    <p key={p.id} className="text-xs text-gray-500">
+                      {p.label}:{" "}
+                      <span className="font-semibold">
+                        {formatPrice(p.price)}
+                      </span>
+                    </p>
+                  ))}
+                  {session.pricings.length > 2 && (
+                    <p className="text-xs text-gray-400">
+                      +{session.pricings.length - 2} más
+                    </p>
+                  )}
+                </div>
 
-                    {/* Acciones */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => setEditingSession(session)}
-                          className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Editar"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(session.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                          title="Eliminar"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                  <button
+                    onClick={() => setEditingSession(session)}
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(session.id)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* Vista escritorio — tabla */}
+          <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                      Tour
+                    </th>
+                    <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
+                      Fecha y hora
+                    </th>
+                    <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
+                      Plazas
+                    </th>
+                    <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
+                      Estado
+                    </th>
+                    <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase">
+                      Tarifas
+                    </th>
+                    <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {sessions.map((session) => (
+                    <tr
+                      key={session.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-[#1a1a2e] text-sm">
+                          {session.tourName}
+                        </p>
+                        {session.includesSeineCruise && (
+                          <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                            Crucero Sena
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        <p className="text-sm text-gray-700">
+                          {formatDate(session.date)}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {formatTime(session.time)}
+                        </p>
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <span className="text-sm font-semibold text-gray-700">
+                          {session.availableSpots}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <select
+                          value={session.status}
+                          onChange={(e) =>
+                            handleStatusChange(session.id, e.target.value)
+                          }
+                          className={`text-xs font-semibold px-3 py-1 rounded-full border-0 cursor-pointer outline-none ${
+                            statusColors[session.status] ??
+                            "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          <option value="Activa">Activa</option>
+                          <option value="Completada">Completada</option>
+                          <option value="Cancelada">Cancelada</option>
+                        </select>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="space-y-0.5">
+                          {session.pricings.slice(0, 2).map((p) => (
+                            <p key={p.id} className="text-xs text-gray-500">
+                              {p.label}:{" "}
+                              <span className="font-semibold">
+                                {formatPrice(p.price)}
+                              </span>
+                            </p>
+                          ))}
+                          {session.pricings.length > 2 && (
+                            <p className="text-xs text-gray-400">
+                              +{session.pricings.length - 2} más
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setEditingSession(session)}
+                            className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Editar"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(session.id)}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Eliminar"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

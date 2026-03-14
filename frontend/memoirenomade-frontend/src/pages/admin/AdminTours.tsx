@@ -142,135 +142,220 @@ export default function AdminTours() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Tour
-                  </th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Destacado
-                  </th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Sesiones
-                  </th>
-                  <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {tours.map((tour) => (
-                  <tr
-                    key={tour.id}
-                    className="hover:bg-gray-50 transition-colors"
+        <>
+          {/* Vista móvil — tarjetas */}
+          <div className="md:hidden space-y-3">
+            {tours.map((tour) => (
+              <div
+                key={tour.id}
+                className="bg-white rounded-2xl shadow-sm p-4 space-y-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                    <img
+                      src={
+                        tour.mainImageUrl ||
+                        "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=100"
+                      }
+                      alt={tour.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[#1a1a2e] text-sm">
+                      {tour.name}
+                    </p>
+                    <p className="text-xs text-gray-400 line-clamp-1">
+                      {tour.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleToggleActive(tour)}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+                      tour.isActive
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-500"
+                    }`}
                   >
-                    {/* Tour */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                          <img
-                            src={
-                              tour.mainImageUrl ||
-                              "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=100"
-                            }
-                            alt={tour.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-[#1a1a2e] text-sm">
-                            {tour.name}
-                          </p>
-                          <p className="text-xs text-gray-400 line-clamp-1 max-w-xs">
-                            {tour.description}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
+                    {tour.isActive ? (
+                      <>
+                        <Eye size={12} /> Activo
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff size={12} /> Inactivo
+                      </>
+                    )}
+                  </button>
 
-                    {/* Estado */}
-                    <td className="px-4 py-4 text-center">
-                      <button
-                        onClick={() => handleToggleActive(tour)}
-                        className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full transition-all ${
-                          tour.isActive
-                            ? "bg-green-100 text-green-700 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                        }`}
-                      >
-                        {tour.isActive ? (
-                          <>
-                            <Eye size={12} /> Activo
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff size={12} /> Inactivo
-                          </>
-                        )}
-                      </button>
-                    </td>
+                  <button
+                    onClick={() => handleToggleFeatured(tour.id)}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+                      tour.isFeatured
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-gray-100 text-gray-400"
+                    }`}
+                  >
+                    {tour.isFeatured ? (
+                      <>
+                        <Star size={12} /> Destacado
+                      </>
+                    ) : (
+                      <>
+                        <StarOff size={12} /> No destacado
+                      </>
+                    )}
+                  </button>
 
-                    {/* Destacado */}
-                    <td className="px-4 py-4 text-center">
-                      <button
-                        onClick={() => handleToggleFeatured(tour.id)}
-                        className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full transition-all ${
-                          tour.isFeatured
-                            ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                        }`}
-                      >
-                        {tour.isFeatured ? (
-                          <>
-                            <Star size={12} /> Destacado
-                          </>
-                        ) : (
-                          <>
-                            <StarOff size={12} /> No destacado
-                          </>
-                        )}
-                      </button>
-                    </td>
+                  <span className="inline-flex items-center text-xs text-gray-500 px-3 py-1 bg-gray-50 rounded-full">
+                    {tour.sessionCount} sesiones
+                  </span>
+                </div>
 
-                    {/* Sesiones */}
-                    <td className="px-4 py-4 text-center">
-                      <span className="text-sm font-semibold text-gray-700">
-                        {tour.sessionCount}
-                      </span>
-                    </td>
-
-                    {/* Acciones */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          to={`/admin/tours/${tour.id}/edit`}
-                          className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Editar"
-                        >
-                          <Pencil size={16} />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(tour.id, tour.name)}
-                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                          title="Eliminar"
-                          disabled={tour.sessionCount > 0}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                  <Link
+                    to={`/admin/tours/${tour.id}/edit`}
+                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                  >
+                    <Pencil size={16} />
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(tour.id, tour.name)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    disabled={tour.sessionCount > 0}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* Vista escritorio — tabla */}
+          <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Tour
+                    </th>
+                    <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Destacado
+                    </th>
+                    <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Sesiones
+                    </th>
+                    <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {tours.map((tour) => (
+                    <tr
+                      key={tour.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                            <img
+                              src={
+                                tour.mainImageUrl ||
+                                "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=100"
+                              }
+                              alt={tour.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-[#1a1a2e] text-sm">
+                              {tour.name}
+                            </p>
+                            <p className="text-xs text-gray-400 line-clamp-1 max-w-xs">
+                              {tour.description}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <button
+                          onClick={() => handleToggleActive(tour)}
+                          className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+                            tour.isActive
+                              ? "bg-green-100 text-green-700 hover:bg-green-200"
+                              : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                          }`}
+                        >
+                          {tour.isActive ? (
+                            <>
+                              <Eye size={12} /> Activo
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff size={12} /> Inactivo
+                            </>
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <button
+                          onClick={() => handleToggleFeatured(tour.id)}
+                          className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+                            tour.isFeatured
+                              ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                              : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          }`}
+                        >
+                          {tour.isFeatured ? (
+                            <>
+                              <Star size={12} /> Destacado
+                            </>
+                          ) : (
+                            <>
+                              <StarOff size={12} /> No destacado
+                            </>
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <span className="text-sm font-semibold text-gray-700">
+                          {tour.sessionCount}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            to={`/admin/tours/${tour.id}/edit`}
+                            className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Editar"
+                          >
+                            <Pencil size={16} />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(tour.id, tour.name)}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Eliminar"
+                            disabled={tour.sessionCount > 0}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
