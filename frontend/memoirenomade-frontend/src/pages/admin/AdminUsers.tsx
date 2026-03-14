@@ -146,7 +146,7 @@ export default function AdminUsers() {
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Cabecera */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
           <h1 className="text-2xl font-serif font-bold text-[#1a1a2e]">
             Administradores
@@ -155,7 +155,7 @@ export default function AdminUsers() {
             {users.length} administradores registrados
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => {
               setShowCredentialsForm(!showCredentialsForm);
@@ -180,7 +180,6 @@ export default function AdminUsers() {
           )}
         </div>
       </div>
-
       {/* Mensajes */}
       {actionError && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-2">
@@ -410,11 +409,11 @@ export default function AdminUsers() {
           {users.map((user) => (
             <div
               key={user.id}
-              className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-5 gap-3 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-4">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
                     user.isSuperAdmin
                       ? "bg-yellow-100 text-yellow-600"
                       : "bg-gray-100 text-gray-500"
@@ -423,7 +422,7 @@ export default function AdminUsers() {
                   {user.name[0].toUpperCase()}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-[#1a1a2e] text-sm">
                       {user.name}
                     </p>
@@ -450,11 +449,10 @@ export default function AdminUsers() {
                 </div>
               </div>
 
-              {/* Acción activar/desactivar (solo superadmin, no a sí mismo) */}
               {currentUser?.isSuperAdmin && user.id !== currentUser?.id && (
                 <button
                   onClick={() => handleToggleActive(user.id, user.isActive)}
-                  className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl transition-all ${
+                  className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl transition-all self-start sm:self-auto ${
                     user.isActive
                       ? "text-red-500 hover:bg-red-50 border-2 border-red-200"
                       : "text-green-600 hover:bg-green-50 border-2 border-green-200"
