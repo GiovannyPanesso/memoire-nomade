@@ -98,15 +98,18 @@ builder.Services.AddScoped<IPayPalService, PayPalService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 
-// CORS -> solo permite el frontend local durante desarrollo
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // Puerto por defecto de Vite
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "https://memoire-nomade.vercel.app",
+                "https://memoire-nomade-demo.vercel.app"
+              )
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Necesario para las HttpOnly Cookies del Refresh Token
+              .AllowCredentials();
     });
 });
 

@@ -1,11 +1,15 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : "/api";
+
 const api = axios.create({
-  baseURL: "/api", // El proxy de Vite redirige al backend
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Necesario para las HttpOnly Cookies del Refresh Token
+  withCredentials: true,
 });
 
 // Interceptor de petición: añade el token JWT a cada llamada
@@ -26,13 +30,16 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Si es 401 y no es un reintento, intentar renovar el token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
+        const refreshUrl = import.meta.env.VITE_API_URL
+          ? `${import.meta.env.VITE_API_URL}/api/auth/refresh`
+          : "/api/auth/refresh";
+
         const response = await axios.post(
-          "/api/auth/refresh",
+          refreshUrl,
           {},
           { withCredentials: true },
         );
@@ -43,7 +50,6 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch {
-        // Refresh token expirado → limpiar sesión
         localStorage.removeItem("accessToken");
         window.location.href = "/admin/login";
       }
