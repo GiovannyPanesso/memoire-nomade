@@ -17,7 +17,7 @@ namespace MemoireNomade.API.Data
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(
+            optionsBuilder.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"));
 
             return new AppDbContext(optionsBuilder.Options);
