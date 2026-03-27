@@ -104,8 +104,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://memoire-nomade.vercel.app",
-                "https://memoire-nomade-demo.vercel.app"
+                "https://memoire-nomade.vercel.app"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
