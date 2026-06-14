@@ -345,6 +345,32 @@ export default function TourDetail() {
                       </div>
                     </div>
 
+                    {/* Selector de adultos */}
+                    <div>
+                      <label className="text-sm text-gray-600 mb-2 block">
+                        Número de adultos
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() =>
+                            setNumAdults(Math.max(0, numAdults - 1))
+                          }
+                          className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-yellow-500 transition-colors"
+                        >
+                          −
+                        </button>
+                        <span className="text-lg font-semibold w-6 text-center">
+                          {numAdults}
+                        </span>
+                        <button
+                          onClick={() => setNumAdults(numAdults + 1)}
+                          className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-yellow-500 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Selector de niños */}
                     {selectedSession.pricings.some(
                       (p) => p.type === "child",

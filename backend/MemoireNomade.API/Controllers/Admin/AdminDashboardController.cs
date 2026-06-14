@@ -22,8 +22,8 @@ namespace MemoireNomade.API.Controllers.Admin
         public async Task<IActionResult> GetDashboard()
         {
             var now = DateTime.UtcNow;
-            var today = now.Date;
-            var firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
+            var today = DateTime.SpecifyKind(now.Date, DateTimeKind.Utc);
+            var firstDayOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
             // Reservas de hoy
             var bookingsToday = await _context.Bookings
