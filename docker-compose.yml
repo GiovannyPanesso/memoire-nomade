@@ -1,0 +1,31 @@
+services:
+  # ── Backend .NET 8 ────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: memoire-nomade-api
+    ports:
+      - "5200:5200"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5200
+    restart: unless-stopped
+
+  # ── Frontend React + Vite (servido por nginx) ─────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_STRIPE_PUBLISHABLE_KEY: pk_test_51SbeQGCwmFMSJt3DFLHqfaNO8AbdLKlDVglDvZBETasjxvPI9Kzd2RTxlHsPUQTlbYkTiK8Ua73Un0Lpq3cktkU400C6qc7rcD
+        VITE_PAYPAL_CLIENT_ID: AUtX39q9IKK46pxbEp6Nu-WyZzFUxPLEx4CgKRvIZbLTxOxUkcx1meYc2DyqXkZDRJB6NuPT8yzFrBPL
+    container_name: memoire-nomade-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: unless-stopped

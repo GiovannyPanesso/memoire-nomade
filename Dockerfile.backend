@@ -1,0 +1,25 @@
+# ── Build stage ──────────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Restore dependencies (capa cacheada)
+COPY backend/MemoireNomade.API/MemoireNomade.API.csproj ./MemoireNomade.API/
+RUN dotnet restore ./MemoireNomade.API/MemoireNomade.API.csproj
+
+# Copiar todo el código fuente excepto bin/obj
+COPY backend/MemoireNomade.API/ ./MemoireNomade.API/
+
+RUN dotnet publish ./MemoireNomade.API/MemoireNomade.API.csproj -c Release -o /app/publish --no-restore
+
+# ── Runtime stage ─────────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+EXPOSE 5200
+
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:5200
+
+ENTRYPOINT ["dotnet", "MemoireNomade.API.dll"]

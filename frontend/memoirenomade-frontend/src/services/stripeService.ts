@@ -11,4 +11,16 @@ export const stripeService = {
       confirmationCode: string;
     };
   },
+
+  confirmPayment: async (
+    confirmationCode: string,
+    paymentIntentId?: string,
+    paymentMethod = "Stripe",
+  ) => {
+    await api.post("/payments/confirm", {
+      confirmationCode,
+      paymentIntentId,
+      paymentMethod,
+    });
+  },
 };

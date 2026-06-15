@@ -299,8 +299,8 @@ POST /api/payments/webhook
 - [x] Phase 3 — Frontend public website
 - [x] Phase 4 — Admin panel
 - [x] Phase 5 — Stripe payments & refunds
-- [ ] Phase 6 — SendGrid email notifications
-- [ ] Phase 7 — Deployment
+- [x] Phase 6 — SendGrid email notifications
+- [x] Phase 7 — Deployment
 
 ---
 
@@ -427,8 +427,8 @@ App disponible en: `http://localhost:5173`
 - [x] Fase 3 — Frontend sitio web público
 - [x] Fase 4 — Panel de administración
 - [x] Fase 5 — Pagos y reembolsos con Stripe
-- [ ] Fase 6 — Notificaciones por email con SendGrid
-- [ ] Fase 7 — Despliegue
+- [x] Fase 6 — Notificaciones por email con SendGrid
+- [x] Fase 7 — Despliegue
 
 ---
 

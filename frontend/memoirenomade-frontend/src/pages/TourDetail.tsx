@@ -58,6 +58,39 @@ export default function TourDetail() {
     fetchData();
   }, [id, navigate]);
 
+  // Encuentra la tarifa que corresponde al número total de personas.
+  // Prefiere tipo group/extra; si no existe ninguna, usa cualquier tarifa disponible.
+  const findMatchingPricing = (
+    adults: number,
+    children: number,
+    session: Session,
+  ): SessionPricing | null => {
+    const total = adults + children;
+    const groupPricings = session.pricings.filter(
+      (p) => p.type === "group" || p.type === "extra",
+    );
+    const pool = groupPricings.length > 0 ? groupPricings : session.pricings;
+    if (pool.length === 0) return null;
+    const match = pool.find((p) => {
+      const aboveMin = p.minPersons === null || total >= p.minPersons;
+      const belowMax = p.maxPersons === null || total <= p.maxPersons;
+      return aboveMin && belowMax;
+    });
+    return match ?? pool[0];
+  };
+
+  const handleNumAdultsChange = (newCount: number) => {
+    setNumAdults(newCount);
+    if (selectedSession)
+      setSelectedPricing(findMatchingPricing(newCount, numChildren, selectedSession));
+  };
+
+  const handleNumChildrenChange = (newCount: number) => {
+    setNumChildren(newCount);
+    if (selectedSession)
+      setSelectedPricing(findMatchingPricing(numAdults, newCount, selectedSession));
+  };
+
   // Calcular subtotal en tiempo real
   const calculateSubtotal = (): number => {
     if (!selectedPricing) return 0;
@@ -259,8 +292,14 @@ export default function TourDetail() {
                         key={session.id}
                         onClick={() => {
                           if (!isInCart) {
+                            const firstPricing =
+                              session.pricings.find(
+                                (p) => p.type === "group" || p.type === "extra",
+                              ) ??
+                              session.pricings[0] ??
+                              null;
                             setSelectedSession(session);
-                            setSelectedPricing(null);
+                            setSelectedPricing(firstPricing);
                             setNumAdults(0);
                             setNumChildren(0);
                           }
@@ -312,39 +351,6 @@ export default function TourDetail() {
                       Composición del grupo
                     </h3>
 
-                    {/* Selector de tarifa de grupo */}
-                    <div>
-                      <label className="text-sm text-gray-600 mb-2 block">
-                        Tarifa de adultos
-                      </label>
-                      <div className="space-y-2">
-                        {selectedSession.pricings
-                          .filter(
-                            (p) => p.type === "group" || p.type === "extra",
-                          )
-                          .map((pricing) => (
-                            <button
-                              key={pricing.id}
-                              onClick={() => setSelectedPricing(pricing)}
-                              className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all ${
-                                selectedPricing?.id === pricing.id
-                                  ? "border-yellow-500 bg-yellow-50"
-                                  : "border-gray-200 bg-white hover:border-yellow-300"
-                              }`}
-                            >
-                              <div className="flex justify-between">
-                                <span className="text-sm font-medium text-[#1a1a2e]">
-                                  {pricing.label}
-                                </span>
-                                <span className="text-sm font-bold text-yellow-600">
-                                  {formatPrice(pricing.price)}
-                                </span>
-                              </div>
-                            </button>
-                          ))}
-                      </div>
-                    </div>
-
                     {/* Selector de adultos */}
                     <div>
                       <label className="text-sm text-gray-600 mb-2 block">
@@ -353,7 +359,7 @@ export default function TourDetail() {
                       <div className="flex items-center gap-4">
                         <button
                           onClick={() =>
-                            setNumAdults(Math.max(0, numAdults - 1))
+                            handleNumAdultsChange(Math.max(0, numAdults - 1))
                           }
                           className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-yellow-500 transition-colors"
                         >
@@ -363,7 +369,7 @@ export default function TourDetail() {
                           {numAdults}
                         </span>
                         <button
-                          onClick={() => setNumAdults(numAdults + 1)}
+                          onClick={() => handleNumAdultsChange(numAdults + 1)}
                           className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-yellow-500 transition-colors"
                         >
                           +
@@ -388,7 +394,7 @@ export default function TourDetail() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() =>
-                              setNumChildren(Math.max(0, numChildren - 1))
+                              handleNumChildrenChange(Math.max(0, numChildren - 1))
                             }
                             className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-yellow-500 transition-colors"
                           >
@@ -398,12 +404,24 @@ export default function TourDetail() {
                             {numChildren}
                           </span>
                           <button
-                            onClick={() => setNumChildren(numChildren + 1)}
+                            onClick={() => handleNumChildrenChange(numChildren + 1)}
                             className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-yellow-500 transition-colors"
                           >
                             +
                           </button>
                         </div>
+                      </div>
+                    )}
+
+                    {/* Tarifa aplicada */}
+                    {selectedPricing && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
+                          {selectedPricing.label}
+                        </span>
+                        <span className="text-sm font-bold text-yellow-600">
+                          {formatPrice(selectedPricing.price)}
+                        </span>
                       </div>
                     )}
 

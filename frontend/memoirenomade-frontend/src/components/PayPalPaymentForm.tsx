@@ -5,7 +5,7 @@ import { formatPrice } from "@/utils/formatters";
 interface PayPalPaymentFormProps {
   amount: number;
   confirmationCode: string;
-  onSuccess: () => void;
+  onSuccess: (paymentIntentId?: string, method?: string) => void;
   onError: (message: string) => void;
 }
 
@@ -48,7 +48,7 @@ export default function PayPalPaymentForm({
           onApprove={async (data) => {
             try {
               await paypalService.captureOrder(data.orderID, confirmationCode);
-              onSuccess();
+              onSuccess(data.orderID, "PayPal");
             } catch {
               onError("No se pudo completar el pago con PayPal.");
             }

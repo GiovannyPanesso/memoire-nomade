@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
 
-// Configuración de Serilog 
+// Configuraciï¿½n de Serilog 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("logs/memoirenomade-.log", rollingInterval: RollingInterval.Day)
@@ -24,7 +24,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "Mémoire Nomade API", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "Mï¿½moire Nomade API", Version = "v1" });
 
     // Permite enviar el token JWT desde Swagger para probar endpoints protegidos
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -55,7 +55,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Autenticación JWT
+// Autenticaciï¿½n JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"]!;
 
@@ -75,19 +75,19 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero // Sin margen extra de expiración
+        ClockSkew = TimeSpan.Zero // Sin margen extra de expiraciï¿½n
     };
 });
 
 builder.Services.AddAuthorization();
 
-// Configuración JWT y Refresh Token desde appsettings
+// Configuraciï¿½n JWT y Refresh Token desde appsettings
 builder.Services.Configure<MemoireNomade.API.Services.JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<MemoireNomade.API.Services.RefreshTokenSettings>(
     builder.Configuration.GetSection("RefreshTokenSettings"));
 
-// Servicio de autenticación
+// Servicio de autenticaciï¿½n
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
@@ -127,13 +127,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("FrontendPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Aplicar migraciones automáticamente al arrancar
+// Aplicar migraciones automï¿½ticamente al arrancar
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

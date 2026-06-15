@@ -87,7 +87,12 @@ export default function Checkout() {
     }
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async (paymentIntentId?: string, method = "Stripe") => {
+    try {
+      await stripeService.confirmPayment(confirmationCode!, paymentIntentId, method);
+    } catch {
+      // El email de admin puede fallar sin bloquear al usuario
+    }
     navigate(`/confirmation/${confirmationCode}`);
   };
 

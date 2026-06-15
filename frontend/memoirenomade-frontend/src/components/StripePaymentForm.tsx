@@ -9,7 +9,7 @@ import { formatPrice } from "@/utils/formatters";
 interface StripePaymentFormProps {
   amount: number;
   confirmationCode: string;
-  onSuccess: () => void;
+  onSuccess: (paymentIntentId?: string, method?: string) => void;
   onError: (message: string) => void;
 }
 
@@ -30,7 +30,7 @@ export default function StripePaymentForm({
 
     setProcessing(true);
 
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/confirmation/${confirmationCode}`,
@@ -42,7 +42,7 @@ export default function StripePaymentForm({
       onError(error.message ?? "Error al procesar el pago.");
       setProcessing(false);
     } else {
-      onSuccess();
+      onSuccess(paymentIntent?.id, "Stripe");
     }
   };
 

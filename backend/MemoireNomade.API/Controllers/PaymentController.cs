@@ -11,6 +11,7 @@ namespace MemoireNomade.API.Controllers;
 public class PaymentController : ControllerBase
 {
     private readonly IStripeService _stripeService;
+    private readonly IBookingService _bookingService;
     private readonly AppDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
@@ -18,12 +19,14 @@ public class PaymentController : ControllerBase
 
     public PaymentController(
         IStripeService stripeService,
+        IBookingService bookingService,
         AppDbContext db,
         IConfiguration configuration,
         IEmailService emailService,
         ILogger<PaymentController> logger)
     {
         _stripeService = stripeService;
+        _bookingService = bookingService;
         _db = db;
         _configuration = configuration;
         _emailService = emailService;
@@ -56,6 +59,55 @@ public class PaymentController : ControllerBase
             amount = booking.TotalAmount,
             confirmationCode = booking.ConfirmationCode
         });
+    }
+
+    // Confirmar pago desde el frontend (para entornos sin webhook accesible)
+    [HttpPost("confirm")]
+    public async Task<IActionResult> ConfirmPayment([FromBody] ConfirmPaymentDto dto)
+    {
+        var booking = await _db.Bookings
+            .Include(b => b.Customer)
+            .Include(b => b.Items)
+                .ThenInclude(i => i.Session)
+                    .ThenInclude(s => s.Tour)
+            .Include(b => b.Items)
+                .ThenInclude(i => i.SessionPricing)
+            .FirstOrDefaultAsync(b => b.ConfirmationCode == dto.ConfirmationCode);
+
+        if (booking == null)
+            return NotFound(new { message = "Reserva no encontrada." });
+
+        if (booking.Status == "Confirmada" || booking.Status == "Completada")
+            return Ok(new { message = "Reserva ya confirmada." });
+
+        await _bookingService.ConfirmBookingAsync(booking.Id, dto.PaymentIntentId ?? "demo", dto.PaymentMethod ?? "Stripe");
+
+        // Notificar al admin
+        try
+        {
+            var emailData = new BookingConfirmationData
+            {
+                CustomerName = booking.Customer.Name,
+                CustomerEmail = booking.Customer.Email,
+                ConfirmationCode = booking.ConfirmationCode,
+                TotalAmount = booking.TotalAmount,
+                Items = booking.Items.Select(i => new BookingItemData
+                {
+                    TourName = i.Session.Tour.Name,
+                    Date = i.Session.Date.ToString("dd/MM/yyyy"),
+                    Time = i.Session.Time.ToString(@"hh\:mm"),
+                    PricingLabel = i.SessionPricing.Label,
+                    Subtotal = i.Subtotal
+                }).ToList()
+            };
+            await _emailService.SendNewBookingNotificationAsync(emailData);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending admin notification for booking {Code}", dto.ConfirmationCode);
+        }
+
+        return Ok(new { message = "Reserva confirmada." });
     }
 
     // Webhook — Stripe llama a este endpoint cuando el pago se completa
@@ -159,4 +211,11 @@ public class PaymentController : ControllerBase
 public class CreatePaymentIntentDto
 {
     public string ConfirmationCode { get; set; } = string.Empty;
+}
+
+public class ConfirmPaymentDto
+{
+    public string ConfirmationCode { get; set; } = string.Empty;
+    public string? PaymentIntentId { get; set; }
+    public string? PaymentMethod { get; set; }
 }
