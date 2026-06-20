@@ -1,0 +1,180 @@
+// =============================================================================
+// Mémoire Nomade — Schema de Prisma
+// Base de datos: PostgreSQL en Supabase
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// =============================================================================
+// TOUR
+// Representa un tour turístico disponible para reservar
+// =============================================================================
+
+model Tour {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nombre        String
+  descripcion   String   @db.Text
+  duracion      String   // Ej: "8 horas", "Día completo"
+  lugaresInteres String[] // Array de nombres de lugares
+  incluye       String[] // Qué está incluido en el precio
+  noIncluye     String[] // Qué no está incluido
+  imagenUrl     String
+  activo        Boolean  @default(true)
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  tarifas        TarifaTour[]
+  disponibilidad DisponibilidadTour[]
+  reservas       Reserva[]
+
+  @@map("tours")
+}
+
+// =============================================================================
+// TARIFA TOUR
+// Precios según rango de personas, niños y opcionales
+// Toda la lógica de precios se gestiona desde el panel admin
+// =============================================================================
+
+model TarifaTour {
+  id     String @id @default(cuid())
+  tourId String
+
+  // Tarifa por rango de adultos
+  minPersonas Int?
+  maxPersonas Int?
+  precio      Decimal  @db.Decimal(10, 2)
+
+  // Si es tarifa para niños
+  esNino      Boolean @default(false)
+  edadMaxNino Int?    // Edad máxima para aplicar tarifa infantil
+
+  // Si es un opcional (crucero, petit train, etc.)
+  esOpcional     Boolean @default(false)
+  nombreOpcional String?
+
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("tarifas_tour")
+}
+
+// =============================================================================
+// DISPONIBILIDAD TOUR
+// Calendario de fechas disponibles o bloqueadas por tour
+// =============================================================================
+
+model DisponibilidadTour {
+  id         String   @id @default(cuid())
+  tourId     String
+  fecha      DateTime @db.Date
+  disponible Boolean  @default(true)
+  motivo     String?  // Razón del bloqueo (festivo, vacaciones, etc.)
+
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@unique([tourId, fecha])
+  @@map("disponibilidad_tours")
+}
+
+// =============================================================================
+// RESERVA
+// Representa una reserva confirmada o en proceso de pago
+// =============================================================================
+
+model Reserva {
+  id     String @id @default(cuid())
+  numero String @unique // Referencia legible tipo MN-2024-001
+
+  // Tour y fecha
+  tourId String
+  fecha  DateTime @db.Date
+
+  // Datos del cliente
+  nombreCliente   String
+  emailCliente    String
+  telefonoCliente String
+  paisCliente     String
+
+  // Composición del grupo
+  numeroAdultos Int
+  numeroNinos   Int     @default(0)
+  edadesNinos   Int[]   // Array de edades de cada niño
+
+  // Opcionales seleccionados (IDs de TarifaTour con esOpcional=true)
+  opcionalesSeleccionados String[]
+
+  // Precio
+  precioTotal Decimal @db.Decimal(10, 2)
+
+  // Estado de la reserva
+  estado EstadoReserva @default(PENDIENTE)
+
+  // Stripe
+  stripePaymentIntentId String? @unique
+
+  // Comunicación
+  mensajeCliente String?  @db.Text // Mensaje opcional del cliente al reservar
+  notas          String?  @db.Text // Campo interno para anotaciones del admin
+
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  tour Tour @relation(fields: [tourId], references: [id])
+
+  @@map("reservas")
+}
+
+// Estados posibles de una reserva a lo largo de su ciclo de vida
+enum EstadoReserva {
+  PENDIENTE   // PaymentIntent creado, pago no completado
+  CONFIRMADA  // Pago exitoso confirmado por webhook de Stripe
+  CANCELADA   // Cancelada (por cliente o empresa)
+  COMPLETADA  // Tour realizado
+}
+
+// =============================================================================
+// ADMIN
+// Usuarios con acceso al panel de administración
+// Solo se gestionan desde el panel /admin/configuracion
+// =============================================================================
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  nombre       String
+  passwordHash String   // bcryptjs con 12 rondas
+  creadoEn     DateTime @default(now())
+
+  @@map("admins")
+}
+
+// =============================================================================
+// CONFIGURACION
+// Ajustes generales del negocio (tabla de una sola fila)
+// =============================================================================
+
+model Configuracion {
+  id              String @id @default("singleton")
+  nombreNegocio   String @default("Mémoire Nomade")
+  emailContacto   String
+  telefonoContacto String
+
+  actualizadoEn DateTime @updatedAt
+
+  @@map("configuracion")
+}
