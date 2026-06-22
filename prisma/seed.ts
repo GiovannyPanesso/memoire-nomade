@@ -3,16 +3,28 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+function obtenerVariableEntorno(nombre: string): string {
+  const valor = process.env[nombre];
+  if (!valor) {
+    throw new Error(
+      `Falta la variable de entorno "${nombre}". Defínela en .env antes de ejecutar el seed.`
+    );
+  }
+  return valor;
+}
+
 async function main() {
   console.log("Iniciando seed...");
 
+  const adminEmail1 = obtenerVariableEntorno("ADMIN_EMAIL_1");
+  const adminPassword = obtenerVariableEntorno("ADMIN_PASSWORD");
+
   // Crear admins iniciales
-  // IMPORTANTE: Cambia estas credenciales antes de ejecutar en producción
   const admins = [
     {
-      email: process.env.ADMIN_EMAIL_1 ?? "admin@memoirenomade.com",
+      email: adminEmail1,
       nombre: "Administrador Principal",
-      password: "CambiarEstaContrasena2024!",
+      password: adminPassword,
     },
   ];
 
@@ -43,7 +55,7 @@ async function main() {
     create: {
       id: "singleton",
       nombreNegocio: "Mémoire Nomade",
-      emailContacto: process.env.ADMIN_EMAIL_1 ?? "admin@memoirenomade.com",
+      emailContacto: adminEmail1,
       telefonoContacto: "+33 6 00 00 00 00",
     },
   });
