@@ -14,11 +14,11 @@ const ETIQUETAS_ESTADO: Record<EstadoReserva, string> = {
   COMPLETADA: "Completada",
 };
 
-interface PropiedadesInsigniaEstado {
+interface PropiedadesBadgeEstado {
   estado: EstadoReserva;
 }
 
-export function InsigniaEstado({ estado }: PropiedadesInsigniaEstado) {
+export function BadgeEstado({ estado }: PropiedadesBadgeEstado) {
   return (
     <span
       className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${ESTILOS_ESTADO[estado]}`}

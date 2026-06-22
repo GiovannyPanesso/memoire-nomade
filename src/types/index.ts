@@ -16,3 +16,72 @@ export interface ReservaReciente {
   precioTotal: number;
   estado: EstadoReserva;
 }
+
+export interface FiltrosReservas {
+  estado?: EstadoReserva;
+  tourId?: string;
+  busqueda?: string;
+  pagina: number;
+}
+
+export interface ReservaListado {
+  id: string;
+  numero: string;
+  nombreCliente: string;
+  emailCliente: string;
+  tourNombre: string;
+  fecha: Date;
+  numeroPersonas: number;
+  precioTotal: number;
+  estado: EstadoReserva;
+  creadoEn: Date;
+}
+
+export interface ResultadoListadoReservas {
+  reservas: ReservaListado[];
+  total: number;
+  totalPaginas: number;
+  paginaActual: number;
+}
+
+export interface OpcionalReserva {
+  id: string;
+  nombre: string;
+  precio: number;
+}
+
+export interface ReservaDetalle {
+  id: string;
+  numero: string;
+  tour: {
+    id: string;
+    nombre: string;
+    duracion: string;
+  };
+  fecha: Date;
+  nombreCliente: string;
+  emailCliente: string;
+  telefonoCliente: string;
+  paisCliente: string;
+  numeroAdultos: number;
+  numeroNinos: number;
+  edadesNinos: number[];
+  opcionales: OpcionalReserva[];
+  precioTotal: number;
+  estado: EstadoReserva;
+  stripePaymentIntentId: string | null;
+  mensajeCliente: string | null;
+  notas: string | null;
+  creadoEn: Date;
+  actualizadoEn: Date;
+}
+
+export interface TourParaFiltro {
+  id: string;
+  nombre: string;
+}
+
+export interface PoliticaCancelacion {
+  porcentajeReembolso: number;
+  descripcion: string;
+}

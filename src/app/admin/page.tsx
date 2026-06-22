@@ -5,7 +5,7 @@ import {
   obtenerReservasRecientes,
 } from "@/lib/reservas/dashboard";
 import { TarjetaResumen } from "@/components/admin/tarjeta-resumen";
-import { InsigniaEstado } from "@/components/admin/insignia-estado";
+import { BadgeEstado } from "@/components/admin/badge-estado";
 
 const formatoMoneda = new Intl.NumberFormat("es-ES", {
   style: "currency",
@@ -101,7 +101,7 @@ export default async function PaginaDashboardAdmin() {
                       {formatoMoneda.format(reserva.precioTotal)}
                     </td>
                     <td className="px-6 py-3">
-                      <InsigniaEstado estado={reserva.estado} />
+                      <BadgeEstado estado={reserva.estado} />
                     </td>
                   </tr>
                 ))}
