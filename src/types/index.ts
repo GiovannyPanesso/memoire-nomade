@@ -131,3 +131,33 @@ export interface DatosTourFormulario {
   imagenUrl: string;
   activo: boolean;
 }
+
+export type EstadoDiaDisponibilidad =
+  | "DISPONIBLE"
+  | "CON_RESERVAS"
+  | "BLOQUEADO"
+  | "PASADO";
+
+export interface DiaCalendarioAdmin {
+  fecha: string; // Fecha en formato ISO yyyy-MM-dd
+  estado: EstadoDiaDisponibilidad;
+  numeroReservas: number;
+}
+
+export interface ReservaDelDia {
+  id: string;
+  nombreCliente: string;
+  estado: EstadoReserva;
+  creadoEn: Date;
+}
+
+export interface DetalleDiaDisponibilidad {
+  fecha: string; // Fecha en formato ISO yyyy-MM-dd
+  bloqueado: boolean;
+  motivo: string | null;
+  reservas: ReservaDelDia[];
+}
+
+export interface DisponibilidadPublicaTour {
+  fechasNoDisponibles: string[]; // Fechas en formato ISO yyyy-MM-dd
+}
