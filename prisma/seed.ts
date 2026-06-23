@@ -246,14 +246,34 @@ async function main() {
   await crearToursIniciales();
 
   // Crear configuración inicial del negocio
+  const imagenesSitio = {
+    logoUrl:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202880/3af44338-47ce-4e33-a2d9-176516247b59_zpg28x.jpg",
+    imagenCabecera:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782203997/foto_hero_paris_mibqeq.jpg",
+    imagenSeccion1:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782203988/piramide-louvre_fwnrel.jpg",
+    imagenSeccion2:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782203979/Sacr%C3%A9-C%C5%93ur_dthr7x.jpg",
+    imagenSeccion3:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782203974/notre_dame_sfouj4.jpg",
+    imagenGaleria1:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782203965/moulin_rouge_tjnriv.jpg",
+    imagenGaleria2:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202874/d24f0ef2-db78-4491-8019-211f1124979a_bugnlt.jpg",
+    imagenGaleria3:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202877/56011bbe-ef52-4fff-823c-5b63e5b6c0ea_lej8k3.jpg",
+  };
+
   await prisma.configuracion.upsert({
     where: { id: "singleton" },
-    update: {},
+    update: imagenesSitio,
     create: {
       id: "singleton",
       nombreNegocio: "Mémoire Nomade",
       emailContacto: adminEmail1,
       telefonoContacto: "+33 6 00 00 00 00",
+      ...imagenesSitio,
     },
   });
   console.log("Configuración inicial creada");

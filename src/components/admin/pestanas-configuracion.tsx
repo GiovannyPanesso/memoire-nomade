@@ -6,18 +6,28 @@ import { eliminarAdmin } from "@/lib/configuracion/acciones";
 import { FormularioConfiguracion } from "@/components/admin/formulario-configuracion";
 import { FormularioNuevoAdmin } from "@/components/admin/formulario-nuevo-admin";
 import { FormularioCambiarPassword } from "@/components/admin/formulario-cambiar-password";
-import type { ConfiguracionNegocio, AdminListado } from "@/types";
+import { FormularioImagenesSitio } from "@/components/admin/formulario-imagenes-sitio";
+import type { ConfiguracionNegocio, AdminListado, ImagenesSitio } from "@/types";
 
-type Pestana = "negocio" | "administradores";
+type Pestana = "negocio" | "administradores" | "imagenes";
+
+interface PropiedadesCloudinary {
+  cloudName: string;
+  apiKey: string;
+}
 
 interface PropiedadesPestanasConfiguracion {
   configuracionInicial: ConfiguracionNegocio;
   admins: AdminListado[];
+  imagenesIniciales: ImagenesSitio;
+  cloudinary: PropiedadesCloudinary | null;
 }
 
 export function PestanasConfiguracion({
   configuracionInicial,
   admins,
+  imagenesIniciales,
+  cloudinary,
 }: PropiedadesPestanasConfiguracion) {
   const router = useRouter();
   const [pestana, setPestana] = useState<Pestana>("negocio");
@@ -70,13 +80,40 @@ export function PestanasConfiguracion({
         >
           Administradores
         </button>
+        <button
+          type="button"
+          onClick={() => setPestana("imagenes")}
+          className={`px-4 py-2.5 text-sm font-medium transition ${
+            pestana === "imagenes"
+              ? "border-b-2 border-marca-dorado text-marca-dorado-oscuro"
+              : "text-marca-gris hover:text-marca-carbon"
+          }`}
+        >
+          Imágenes del sitio
+        </button>
       </div>
 
       {pestana === "negocio" ? (
         <section className="max-w-xl rounded-lg border border-marca-dorado/20 bg-white p-6">
           <FormularioConfiguracion configuracionInicial={configuracionInicial} />
         </section>
-      ) : (
+      ) : null}
+
+      {pestana === "imagenes" ? (
+        <div className="max-w-3xl space-y-4">
+          <p className="text-sm text-marca-gris">
+            Estas son las fotos que ven los visitantes en la web pública.
+            Pega un enlace o sube una imagen desde tu dispositivo, revisa la
+            vista previa y guarda los cambios al final.
+          </p>
+          <FormularioImagenesSitio
+            imagenesIniciales={imagenesIniciales}
+            cloudinary={cloudinary}
+          />
+        </div>
+      ) : null}
+
+      {pestana === "administradores" ? (
         <div className="space-y-6">
           <section className="rounded-lg border border-marca-dorado/20 bg-white p-6">
             <h2 className="font-serif text-lg text-marca-carbon">
@@ -135,7 +172,7 @@ export function PestanasConfiguracion({
             </section>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

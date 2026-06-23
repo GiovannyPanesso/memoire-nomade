@@ -173,3 +173,25 @@ export interface AdminListado {
   nombre: string;
   email: string;
 }
+
+export interface ImagenesSitio {
+  logoUrl: string | null;
+  imagenCabecera: string | null;
+  imagenSeccion1: string | null;
+  imagenSeccion2: string | null;
+  imagenSeccion3: string | null;
+  imagenGaleria1: string | null;
+  imagenGaleria2: string | null;
+  imagenGaleria3: string | null;
+}
+
+export interface DatosImagenesSitioFormulario {
+  logoUrl: string;
+  imagenCabecera: string;
+  imagenSeccion1: string;
+  imagenSeccion2: string;
+  imagenSeccion3: string;
+  imagenGaleria1: string;
+  imagenGaleria2: string;
+  imagenGaleria3: string;
+}

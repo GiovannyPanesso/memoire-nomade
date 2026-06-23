@@ -7,7 +7,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma/cliente";
 import { exigirSesionAdmin } from "@/lib/auth/exigir-sesion-admin";
 import { analizarZod } from "@/lib/validacion/analizar-zod";
-import type { ConfiguracionNegocio } from "@/types";
+import type { ConfiguracionNegocio, DatosImagenesSitioFormulario } from "@/types";
 
 const RONDAS_BCRYPT = 12;
 const ID_CONFIGURACION = "singleton";
@@ -154,4 +154,52 @@ export async function cambiarPasswordPropia(
     where: { id: admin.id },
     data: { passwordHash },
   });
+}
+
+function esUrlValida(valor: string): boolean {
+  try {
+    new URL(valor);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const esquemaCampoImagen = z
+  .string()
+  .trim()
+  .refine((valor) => valor === "" || esUrlValida(valor), {
+    message: "Debe ser una URL válida",
+  })
+  .transform((valor) => (valor === "" ? null : valor));
+
+const esquemaImagenesSitio = z.object({
+  logoUrl: esquemaCampoImagen,
+  imagenCabecera: esquemaCampoImagen,
+  imagenSeccion1: esquemaCampoImagen,
+  imagenSeccion2: esquemaCampoImagen,
+  imagenSeccion3: esquemaCampoImagen,
+  imagenGaleria1: esquemaCampoImagen,
+  imagenGaleria2: esquemaCampoImagen,
+  imagenGaleria3: esquemaCampoImagen,
+});
+
+export async function actualizarImagenesSitio(
+  datos: DatosImagenesSitioFormulario
+): Promise<void> {
+  await exigirSesionAdmin();
+  const datosValidados = analizarZod(esquemaImagenesSitio, datos);
+
+  await prisma.configuracion.upsert({
+    where: { id: ID_CONFIGURACION },
+    update: datosValidados,
+    create: {
+      id: ID_CONFIGURACION,
+      emailContacto: "",
+      telefonoContacto: "",
+      ...datosValidados,
+    },
+  });
+
+  revalidatePath("/admin/configuracion");
 }

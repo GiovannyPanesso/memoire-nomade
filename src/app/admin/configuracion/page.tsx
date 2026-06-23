@@ -1,11 +1,18 @@
-import { obtenerConfiguracion, obtenerAdmins } from "@/lib/configuracion/consultas";
+import {
+  obtenerConfiguracion,
+  obtenerAdmins,
+  obtenerImagenesSitio,
+} from "@/lib/configuracion/consultas";
+import { obtenerConfigCloudinaryCliente } from "@/lib/cloudinary/config";
 import { PestanasConfiguracion } from "@/components/admin/pestanas-configuracion";
 
 export default async function PaginaConfiguracion() {
-  const [configuracion, admins] = await Promise.all([
+  const [configuracion, admins, imagenesSitio] = await Promise.all([
     obtenerConfiguracion(),
     obtenerAdmins(),
+    obtenerImagenesSitio(),
   ]);
+  const cloudinary = obtenerConfigCloudinaryCliente();
 
   return (
     <div className="space-y-6">
@@ -16,7 +23,12 @@ export default async function PaginaConfiguracion() {
         </p>
       </div>
 
-      <PestanasConfiguracion configuracionInicial={configuracion} admins={admins} />
+      <PestanasConfiguracion
+        configuracionInicial={configuracion}
+        admins={admins}
+        imagenesIniciales={imagenesSitio}
+        cloudinary={cloudinary}
+      />
     </div>
   );
 }
