@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { opcionesAuth } from "@/lib/auth/opciones-auth";
-import { BotonCerrarSesion } from "@/components/admin/boton-cerrar-sesion";
+import { Sidebar } from "@/components/admin/sidebar";
 
 export default async function LayoutAdmin({
   children,
@@ -23,17 +23,9 @@ export default async function LayoutAdmin({
   }
 
   return (
-    <div className="min-h-screen bg-marca-crema">
-      <header className="flex items-center justify-between border-b border-marca-dorado/30 bg-white px-6 py-4">
-        <span className="font-serif text-lg text-marca-carbon">
-          Mémoire Nomade — Administración
-        </span>
-        <div className="flex items-center gap-4 text-sm text-marca-gris">
-          <span>{sesion.user?.name}</span>
-          <BotonCerrarSesion />
-        </div>
-      </header>
-      <main className="px-6 py-8">{children}</main>
+    <div className="flex min-h-screen flex-col bg-marca-crema lg:flex-row">
+      <Sidebar nombreAdmin={sesion.user?.name ?? ""} />
+      <main className="flex-1 px-6 py-8">{children}</main>
     </div>
   );
 }
