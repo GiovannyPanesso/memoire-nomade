@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma/cliente";
 import { exigirSesionAdmin } from "@/lib/auth/exigir-sesion-admin";
 import { fechaIsoAFechaUTC, fechaUTCAFechaISO } from "@/lib/disponibilidad/fechas";
+import { analizarZod } from "@/lib/validacion/analizar-zod";
 
 const LIMITE_DIAS_RANGO = 366;
 
@@ -39,7 +40,7 @@ export async function bloquearFecha(
   motivo?: string
 ): Promise<void> {
   await exigirSesionAdmin();
-  const datos = esquemaBloquearFecha.parse({ tourId, fecha, motivo });
+  const datos = analizarZod(esquemaBloquearFecha, { tourId, fecha, motivo });
 
   if (datos.fecha < obtenerFechaHoyIsoUTC()) {
     throw new Error("No se puede bloquear una fecha pasada.");
@@ -70,7 +71,7 @@ export async function desbloquearFecha(
   fecha: string
 ): Promise<void> {
   await exigirSesionAdmin();
-  const datos = esquemaDesbloquearFecha.parse({ tourId, fecha });
+  const datos = analizarZod(esquemaDesbloquearFecha, { tourId, fecha });
 
   await prisma.disponibilidadTour.deleteMany({
     where: { tourId: datos.tourId, fecha: fechaIsoAFechaUTC(datos.fecha) },
@@ -109,7 +110,7 @@ export async function bloquearRango(
   motivo?: string
 ): Promise<void> {
   await exigirSesionAdmin();
-  const datos = esquemaBloquearRango.parse({
+  const datos = analizarZod(esquemaBloquearRango, {
     tourId,
     fechaInicio,
     fechaFin,
@@ -150,7 +151,7 @@ export async function desbloquearRango(
   fechaFin: string
 ): Promise<void> {
   await exigirSesionAdmin();
-  const datos = esquemaRangoFechas.parse({ tourId, fechaInicio, fechaFin });
+  const datos = analizarZod(esquemaRangoFechas, { tourId, fechaInicio, fechaFin });
 
   await prisma.disponibilidadTour.deleteMany({
     where: {

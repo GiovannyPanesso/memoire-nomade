@@ -6,4 +6,5 @@ export async function exigirSesionAdmin() {
   if (!sesion) {
     throw new Error("No autorizado");
   }
+  return sesion;
 }

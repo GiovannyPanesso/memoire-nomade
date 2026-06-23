@@ -161,3 +161,15 @@ export interface DetalleDiaDisponibilidad {
 export interface DisponibilidadPublicaTour {
   fechasNoDisponibles: string[]; // Fechas en formato ISO yyyy-MM-dd
 }
+
+export interface ConfiguracionNegocio {
+  nombreNegocio: string;
+  emailContacto: string;
+  telefonoContacto: string;
+}
+
+export interface AdminListado {
+  id: string;
+  nombre: string;
+  email: string;
+}

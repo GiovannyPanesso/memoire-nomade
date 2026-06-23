@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma/cliente";
 import { exigirSesionAdmin } from "@/lib/auth/exigir-sesion-admin";
+import { analizarZod } from "@/lib/validacion/analizar-zod";
 import type { DatosTourFormulario } from "@/types";
 
 const esquemaTour = z.object({
@@ -29,7 +30,7 @@ export async function crearTour(
   datos: DatosTourFormulario
 ): Promise<{ id: string }> {
   await exigirSesionAdmin();
-  const datosValidados = esquemaTour.parse(datos);
+  const datosValidados = analizarZod(esquemaTour, datos);
 
   const existente = await prisma.tour.findUnique({
     where: { slug: datosValidados.slug },
@@ -59,7 +60,7 @@ export async function actualizarTour(
   datos: DatosTourFormulario
 ): Promise<void> {
   await exigirSesionAdmin();
-  const datosValidados = esquemaTour.parse(datos);
+  const datosValidados = analizarZod(esquemaTour, datos);
 
   const existente = await prisma.tour.findFirst({
     where: { slug: datosValidados.slug, NOT: { id } },
@@ -89,7 +90,7 @@ const esquemaIdTour = z.string().min(1);
 
 export async function eliminarTour(id: string): Promise<void> {
   await exigirSesionAdmin();
-  const idValidado = esquemaIdTour.parse(id);
+  const idValidado = analizarZod(esquemaIdTour, id);
 
   try {
     await prisma.tour.delete({ where: { id: idValidado } });
@@ -113,9 +114,10 @@ export async function alternarActivoTour(
   activo: boolean
 ): Promise<void> {
   await exigirSesionAdmin();
-  const datosValidados = z
-    .object({ id: z.string().min(1), activo: z.boolean() })
-    .parse({ id, activo });
+  const datosValidados = analizarZod(
+    z.object({ id: z.string().min(1), activo: z.boolean() }),
+    { id, activo }
+  );
 
   await prisma.tour.update({
     where: { id: datosValidados.id },
@@ -143,7 +145,7 @@ export async function crearTarifaRango(
 ): Promise<void> {
   await exigirSesionAdmin();
 
-  const datosValidados = esquemaTarifaRango.parse({
+  const datosValidados = analizarZod(esquemaTarifaRango, {
     tourId,
     minPersonas: formData.get("minPersonas"),
     maxPersonas: formData.get("maxPersonas"),
@@ -174,7 +176,7 @@ export async function crearTarifaNino(
 ): Promise<void> {
   await exigirSesionAdmin();
 
-  const datosValidados = esquemaTarifaNino.parse({
+  const datosValidados = analizarZod(esquemaTarifaNino, {
     tourId,
     edadMaxNino: formData.get("edadMaxNino"),
     precio: formData.get("precio"),
@@ -204,7 +206,7 @@ export async function crearTarifaOpcional(
 ): Promise<void> {
   await exigirSesionAdmin();
 
-  const datosValidados = esquemaTarifaOpcional.parse({
+  const datosValidados = analizarZod(esquemaTarifaOpcional, {
     tourId,
     nombreOpcional: formData.get("nombreOpcional"),
     precio: formData.get("precio"),
@@ -229,7 +231,7 @@ const esquemaEliminarTarifa = z.object({
 
 export async function eliminarTarifa(id: string, tourId: string): Promise<void> {
   await exigirSesionAdmin();
-  const datosValidados = esquemaEliminarTarifa.parse({ id, tourId });
+  const datosValidados = analizarZod(esquemaEliminarTarifa, { id, tourId });
 
   await prisma.tarifaTour.delete({ where: { id: datosValidados.id } });
 
