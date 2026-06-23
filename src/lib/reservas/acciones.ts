@@ -3,16 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { EstadoReserva } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { opcionesAuth } from "@/lib/auth/opciones-auth";
 import { prisma } from "@/lib/prisma/cliente";
-
-async function exigirSesionAdmin() {
-  const sesion = await getServerSession(opcionesAuth);
-  if (!sesion) {
-    throw new Error("No autorizado");
-  }
-}
+import { exigirSesionAdmin } from "@/lib/auth/exigir-sesion-admin";
 
 const esquemaCambiarEstado = z.object({
   id: z.string().min(1),
