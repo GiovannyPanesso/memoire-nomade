@@ -1,0 +1,16 @@
+export const PAISES = [
+  "España",
+  "México",
+  "Colombia",
+  "Argentina",
+  "Chile",
+  "Perú",
+  "Venezuela",
+  "Ecuador",
+  "Uruguay",
+  "Paraguay",
+  "Bolivia",
+  "Estados Unidos",
+  "Francia",
+  "Otro país",
+] as const;

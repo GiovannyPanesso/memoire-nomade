@@ -129,9 +129,12 @@ export default async function PaginaDetalleReserva({
                     key={opcional.id}
                     className="flex justify-between text-marca-gris"
                   >
-                    <span>{opcional.nombre}</span>
+                    <span>
+                      {opcional.nombre} ({opcional.cantidad}{" "}
+                      {opcional.cantidad === 1 ? "persona" : "personas"})
+                    </span>
                     <span className="text-marca-carbon">
-                      {formatoMoneda.format(opcional.precio)}
+                      {formatoMoneda.format(opcional.precio * opcional.cantidad)}
                     </span>
                   </li>
                 ))}

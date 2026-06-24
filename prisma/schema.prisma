@@ -115,8 +115,10 @@ model Reserva {
   numeroNinos   Int     @default(0)
   edadesNinos   Int[]   // Array de edades de cada niño
 
-  // Opcionales seleccionados (IDs de TarifaTour con esOpcional=true)
-  opcionalesSeleccionados String[]
+  // Opcionales seleccionados: array de { tarifaId, cantidad }. La cantidad
+  // es independiente del tamaño del grupo (no todos los pasajeros tienen
+  // que tomar cada opcional).
+  opcionalesSeleccionados Json @default("[]")
 
   // Precio
   precioTotal Decimal @db.Decimal(10, 2)

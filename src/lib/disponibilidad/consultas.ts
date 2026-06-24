@@ -131,3 +131,17 @@ export async function obtenerDisponibilidadPublica(
 
   return bloqueos.map((bloqueo) => fechaUTCAFechaISO(bloqueo.fecha));
 }
+
+export async function verificarFechaDisponible(
+  tourId: string,
+  fechaIso: string
+): Promise<boolean> {
+  const fecha = fechaIsoAFechaUTC(fechaIso);
+
+  const bloqueo = await prisma.disponibilidadTour.findUnique({
+    where: { tourId_fecha: { tourId, fecha } },
+    select: { disponible: true },
+  });
+
+  return bloqueo ? bloqueo.disponible : true;
+}

@@ -48,6 +48,13 @@ export interface OpcionalReserva {
   id: string;
   nombre: string;
   precio: number;
+  cantidad: number;
+}
+
+// Forma persistida en Reserva.opcionalesSeleccionados (campo Json)
+export interface OpcionalSeleccionadoReserva {
+  tarifaId: string;
+  cantidad: number;
 }
 
 export interface ReservaDetalle {
@@ -199,6 +206,39 @@ export interface ImagenesSitio {
   imagenCliente4: string | null;
   imagenCliente5: string | null;
   imagenCliente6: string | null;
+}
+
+export interface OpcionalEmailReserva {
+  nombre: string;
+  precio: number;
+  cantidad: number;
+}
+
+export interface DatosEmailReserva {
+  reservaId: string;
+  numero: string;
+  nombreCliente: string;
+  emailCliente: string;
+  telefonoCliente: string;
+  paisCliente: string;
+  tourNombre: string;
+  tourDuracion: string;
+  tourIncluye: string[];
+  fecha: Date;
+  numeroAdultos: number;
+  numeroNinos: number;
+  opcionales: OpcionalEmailReserva[];
+  precioTotal: number;
+  mensajeCliente: string | null;
+  stripePaymentIntentId: string | null;
+  emailContacto: string;
+  telefonoContacto: string;
+}
+
+export interface ConfirmacionReservaPublica {
+  numero: string;
+  tourNombre: string;
+  fecha: Date;
 }
 
 export interface DatosImagenesSitioFormulario {

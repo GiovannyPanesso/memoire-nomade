@@ -6,6 +6,7 @@ import { Minus, Plus, X } from "lucide-react";
 import { CalendarioDisponibilidad } from "@/components/tours/calendario-disponibilidad";
 import { calcularPrecioTotal } from "@/lib/tours/calculadora-precio";
 import { formatearFechaISO } from "@/lib/disponibilidad/fechas";
+import { codificarCantidadesOpcionales } from "@/lib/reservas/opcionales";
 import type { TarifaTourDetalle } from "@/types";
 
 const EDAD_NINO_PREDETERMINADA = 8;
@@ -35,20 +36,31 @@ export function CalculadoraPrecio({
 }: PropiedadesCalculadoraPrecio) {
   const [numeroAdultos, setNumeroAdultos] = useState(2);
   const [edadesNinos, setEdadesNinos] = useState<number[]>([]);
-  const [opcionalesSeleccionados, setOpcionalesSeleccionados] = useState<string[]>(
-    []
-  );
+  const [cantidadesOpcionales, setCantidadesOpcionales] = useState<
+    Record<string, number>
+  >({});
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | undefined>(
     undefined
   );
 
   const tarifasOpcionales = tarifas.filter((tarifa) => tarifa.esOpcional);
+  const totalPersonas = numeroAdultos + edadesNinos.length;
+
+  // El tamaño del grupo puede reducirse después de elegir cantidades de
+  // opcionales; recalculamos el límite aquí en vez de mutar el estado.
+  const cantidadesOpcionalesClamped = tarifasOpcionales.reduce<Record<string, number>>(
+    (acumulado, tarifa) => {
+      acumulado[tarifa.id] = Math.min(cantidadesOpcionales[tarifa.id] ?? 0, totalPersonas);
+      return acumulado;
+    },
+    {}
+  );
 
   const resultado = calcularPrecioTotal({
     tarifas,
     numeroAdultos,
     edadesNinos,
-    idsOpcionalesSeleccionados: opcionalesSeleccionados,
+    cantidadesOpcionales: cantidadesOpcionalesClamped,
   });
 
   function agregarNino() {
@@ -65,13 +77,17 @@ export function CalculadoraPrecio({
     setEdadesNinos((anterior) => anterior.filter((_, i) => i !== indice));
   }
 
-  function alternarOpcional(id: string) {
-    setOpcionalesSeleccionados((anterior) =>
-      anterior.includes(id)
-        ? anterior.filter((opcionalId) => opcionalId !== id)
-        : [...anterior, id]
-    );
+  function actualizarCantidadOpcional(id: string, delta: number) {
+    setCantidadesOpcionales((anterior) => {
+      const actual = anterior[id] ?? 0;
+      const siguiente = Math.min(Math.max(actual + delta, 0), totalPersonas);
+      return { ...anterior, [id]: siguiente };
+    });
   }
+
+  const hayOpcionalesSeleccionados = Object.values(cantidadesOpcionalesClamped).some(
+    (cantidad) => cantidad > 0
+  );
 
   const parametrosReserva = new URLSearchParams();
   parametrosReserva.set("tour", slug);
@@ -82,8 +98,11 @@ export function CalculadoraPrecio({
   if (edadesNinos.length > 0) {
     parametrosReserva.set("edadesNinos", edadesNinos.join(","));
   }
-  if (opcionalesSeleccionados.length > 0) {
-    parametrosReserva.set("opcionales", opcionalesSeleccionados.join(","));
+  if (hayOpcionalesSeleccionados) {
+    parametrosReserva.set(
+      "opcionales",
+      codificarCantidadesOpcionales(cantidadesOpcionalesClamped)
+    );
   }
 
   return (
@@ -181,23 +200,50 @@ export function CalculadoraPrecio({
         {tarifasOpcionales.length > 0 ? (
           <div>
             <h3 className="font-serif text-lg text-marca-carbon">Opcionales</h3>
-            <ul className="mt-2 space-y-2">
-              {tarifasOpcionales.map((tarifa) => (
-                <li key={tarifa.id} className="flex items-center justify-between gap-3">
-                  <label className="flex items-center gap-2 text-sm text-marca-carbon">
-                    <input
-                      type="checkbox"
-                      checked={opcionalesSeleccionados.includes(tarifa.id)}
-                      onChange={() => alternarOpcional(tarifa.id)}
-                      className="h-4 w-4 rounded border-marca-gris/30 text-marca-dorado focus:ring-marca-dorado"
-                    />
-                    {tarifa.nombreOpcional}
-                  </label>
-                  <span className="text-sm text-marca-gris">
-                    +{formatoMoneda.format(tarifa.precio)} / persona
-                  </span>
-                </li>
-              ))}
+            <p className="mt-1 text-xs text-marca-gris">
+              Elige cuántas personas del grupo quieren cada opcional — no tiene
+              que ser todo el grupo.
+            </p>
+            <ul className="mt-2 space-y-3">
+              {tarifasOpcionales.map((tarifa) => {
+                const cantidad = cantidadesOpcionalesClamped[tarifa.id] ?? 0;
+                return (
+                  <li
+                    key={tarifa.id}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <div>
+                      <p className="text-sm text-marca-carbon">{tarifa.nombreOpcional}</p>
+                      <p className="text-xs text-marca-gris">
+                        {formatoMoneda.format(tarifa.precio)} / persona
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => actualizarCantidadOpcional(tarifa.id, -1)}
+                        disabled={cantidad <= 0}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-marca-gris/30 text-marca-carbon transition hover:border-marca-dorado disabled:cursor-not-allowed disabled:opacity-40"
+                        aria-label={`Quitar una unidad de ${tarifa.nombreOpcional}`}
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="w-5 text-center text-sm font-medium text-marca-carbon">
+                        {cantidad}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => actualizarCantidadOpcional(tarifa.id, 1)}
+                        disabled={cantidad >= totalPersonas}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-marca-gris/30 text-marca-carbon transition hover:border-marca-dorado disabled:cursor-not-allowed disabled:opacity-40"
+                        aria-label={`Añadir una unidad de ${tarifa.nombreOpcional}`}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}
@@ -214,7 +260,7 @@ export function CalculadoraPrecio({
                 <span>{formatoMoneda.format(resultado.precioNinos)}</span>
               </div>
             ) : null}
-            {opcionalesSeleccionados.length > 0 ? (
+            {hayOpcionalesSeleccionados ? (
               <div className="flex justify-between">
                 <span>Opcionales</span>
                 <span>{formatoMoneda.format(resultado.precioOpcionales)}</span>

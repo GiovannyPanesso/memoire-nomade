@@ -1,11 +1,19 @@
 import { Prisma, EstadoReserva } from "@prisma/client";
 import { prisma } from "@/lib/prisma/cliente";
+import {
+  construirOpcionalesEmail,
+  parsearOpcionalesSeleccionados,
+} from "@/lib/reservas/opcionales";
+import { construirDatosEmailReserva } from "@/lib/reservas/datos-email";
+import { obtenerConfiguracion } from "@/lib/configuracion/consultas";
 import type {
   FiltrosReservas,
   ReservaListado,
   ResultadoListadoReservas,
   ReservaDetalle,
   TourParaFiltro,
+  ConfirmacionReservaPublica,
+  DatosEmailReserva,
 } from "@/types";
 
 export const TAMANIO_PAGINA = 20;
@@ -149,12 +157,20 @@ export async function obtenerReservaPorId(
     return null;
   }
 
+  const opcionalesSeleccionados = parsearOpcionalesSeleccionados(
+    reserva.opcionalesSeleccionados
+  );
+
   const tarifasOpcionales =
-    reserva.opcionalesSeleccionados.length > 0
+    opcionalesSeleccionados.length > 0
       ? await prisma.tarifaTour.findMany({
-          where: { id: { in: reserva.opcionalesSeleccionados } },
+          where: { id: { in: opcionalesSeleccionados.map((o) => o.tarifaId) } },
         })
       : [];
+
+  const tarifasOpcionalesPorId = new Map(
+    tarifasOpcionales.map((tarifa) => [tarifa.id, tarifa])
+  );
 
   return {
     id: reserva.id,
@@ -168,11 +184,20 @@ export async function obtenerReservaPorId(
     numeroAdultos: reserva.numeroAdultos,
     numeroNinos: reserva.numeroNinos,
     edadesNinos: reserva.edadesNinos,
-    opcionales: tarifasOpcionales.map((tarifa) => ({
-      id: tarifa.id,
-      nombre: tarifa.nombreOpcional ?? "Opcional",
-      precio: tarifa.precio.toNumber(),
-    })),
+    opcionales: opcionalesSeleccionados.flatMap((opcional) => {
+      const tarifa = tarifasOpcionalesPorId.get(opcional.tarifaId);
+      if (!tarifa) {
+        return [];
+      }
+      return [
+        {
+          id: tarifa.id,
+          nombre: tarifa.nombreOpcional ?? "Opcional",
+          precio: tarifa.precio.toNumber(),
+          cantidad: opcional.cantidad,
+        },
+      ];
+    }),
     precioTotal: reserva.precioTotal.toNumber(),
     estado: reserva.estado,
     stripePaymentIntentId: reserva.stripePaymentIntentId,
@@ -181,6 +206,66 @@ export async function obtenerReservaPorId(
     creadoEn: reserva.creadoEn,
     actualizadoEn: reserva.actualizadoEn,
   };
+}
+
+// Pública: solo se llama con el id del PaymentIntent que el propio cliente
+// recibió de Stripe tras pagar, para mostrarle el número de su reserva.
+export async function obtenerConfirmacionReservaPorPaymentIntent(
+  paymentIntentId: string
+): Promise<ConfirmacionReservaPublica | null> {
+  const reserva = await prisma.reserva.findUnique({
+    where: { stripePaymentIntentId: paymentIntentId },
+    select: { numero: true, fecha: true, tour: { select: { nombre: true } } },
+  });
+
+  if (!reserva) {
+    return null;
+  }
+
+  return {
+    numero: reserva.numero,
+    tourNombre: reserva.tour.nombre,
+    fecha: reserva.fecha,
+  };
+}
+
+// Pública por el mismo motivo que la función anterior: permite generar el
+// PDF descargable de la reserva desde la pantalla de confirmación.
+export async function obtenerDatosEmailReservaPorPaymentIntent(
+  paymentIntentId: string
+): Promise<DatosEmailReserva | null> {
+  const reserva = await prisma.reserva.findUnique({
+    where: { stripePaymentIntentId: paymentIntentId },
+    include: { tour: true },
+  });
+
+  if (!reserva) {
+    return null;
+  }
+
+  const opcionalesSeleccionados = parsearOpcionalesSeleccionados(
+    reserva.opcionalesSeleccionados
+  );
+
+  const tarifasOpcionales =
+    opcionalesSeleccionados.length > 0
+      ? await prisma.tarifaTour.findMany({
+          where: { id: { in: opcionalesSeleccionados.map((o) => o.tarifaId) } },
+        })
+      : [];
+
+  const opcionales = construirOpcionalesEmail(
+    tarifasOpcionales.map((tarifa) => ({
+      id: tarifa.id,
+      nombreOpcional: tarifa.nombreOpcional,
+      precio: tarifa.precio.toNumber(),
+    })),
+    opcionalesSeleccionados
+  );
+
+  const configuracion = await obtenerConfiguracion();
+
+  return construirDatosEmailReserva(reserva, reserva.tour, opcionales, configuracion);
 }
 
 export async function obtenerToursParaFiltro(): Promise<TourParaFiltro[]> {

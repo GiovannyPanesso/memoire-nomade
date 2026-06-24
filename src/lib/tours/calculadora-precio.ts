@@ -4,7 +4,9 @@ interface ParametrosCalculoPrecio {
   tarifas: TarifaTourDetalle[];
   numeroAdultos: number;
   edadesNinos: number[];
-  idsOpcionalesSeleccionados: string[];
+  // Tarifa de opcional (id) -> cantidad de personas que lo toman. No tiene
+  // por qué coincidir con el total de adultos + niños de la reserva.
+  cantidadesOpcionales: Record<string, number>;
 }
 
 export interface ResultadoCalculoPrecio {
@@ -43,7 +45,7 @@ export function calcularPrecioTotal({
   tarifas,
   numeroAdultos,
   edadesNinos,
-  idsOpcionalesSeleccionados,
+  cantidadesOpcionales,
 }: ParametrosCalculoPrecio): ResultadoCalculoPrecio {
   const tarifaAdulto = obtenerTarifaAdulto(tarifas, numeroAdultos);
   const tarifaNino = obtenerTarifaNino(tarifas);
@@ -57,13 +59,12 @@ export function calcularPrecioTotal({
     return acumulado + (tarifaAdulto?.precio ?? 0);
   }, 0);
 
-  const totalPersonas = numeroAdultos + edadesNinos.length;
-
   const precioOpcionales = tarifas
-    .filter(
-      (tarifa) => tarifa.esOpcional && idsOpcionalesSeleccionados.includes(tarifa.id)
-    )
-    .reduce((acumulado, tarifa) => acumulado + tarifa.precio * totalPersonas, 0);
+    .filter((tarifa) => tarifa.esOpcional)
+    .reduce((acumulado, tarifa) => {
+      const cantidad = cantidadesOpcionales[tarifa.id] ?? 0;
+      return acumulado + tarifa.precio * cantidad;
+    }, 0);
 
   return {
     precioAdultos,
