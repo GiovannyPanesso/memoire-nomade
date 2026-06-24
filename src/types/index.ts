@@ -120,6 +120,16 @@ export interface TourDetalle {
   tarifas: TarifaTourDetalle[];
 }
 
+export interface TourPublico {
+  id: string;
+  slug: string;
+  nombre: string;
+  descripcion: string;
+  duracion: string;
+  imagenUrl: string;
+  precioDesde: number;
+}
+
 export interface DatosTourFormulario {
   nombre: string;
   slug: string;
@@ -183,6 +193,12 @@ export interface ImagenesSitio {
   imagenGaleria1: string | null;
   imagenGaleria2: string | null;
   imagenGaleria3: string | null;
+  imagenCliente1: string | null;
+  imagenCliente2: string | null;
+  imagenCliente3: string | null;
+  imagenCliente4: string | null;
+  imagenCliente5: string | null;
+  imagenCliente6: string | null;
 }
 
 export interface DatosImagenesSitioFormulario {
@@ -194,4 +210,10 @@ export interface DatosImagenesSitioFormulario {
   imagenGaleria1: string;
   imagenGaleria2: string;
   imagenGaleria3: string;
+  imagenCliente1: string;
+  imagenCliente2: string;
+  imagenCliente3: string;
+  imagenCliente4: string;
+  imagenCliente5: string;
+  imagenCliente6: string;
 }

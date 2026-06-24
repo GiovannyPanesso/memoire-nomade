@@ -40,5 +40,11 @@ export async function obtenerImagenesSitio(): Promise<ImagenesSitio> {
     imagenGaleria1: configuracion.imagenGaleria1,
     imagenGaleria2: configuracion.imagenGaleria2,
     imagenGaleria3: configuracion.imagenGaleria3,
+    imagenCliente1: configuracion.imagenCliente1,
+    imagenCliente2: configuracion.imagenCliente2,
+    imagenCliente3: configuracion.imagenCliente3,
+    imagenCliente4: configuracion.imagenCliente4,
+    imagenCliente5: configuracion.imagenCliente5,
+    imagenCliente6: configuracion.imagenCliente6,
   };
 }

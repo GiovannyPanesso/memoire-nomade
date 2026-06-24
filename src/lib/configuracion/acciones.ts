@@ -182,6 +182,12 @@ const esquemaImagenesSitio = z.object({
   imagenGaleria1: esquemaCampoImagen,
   imagenGaleria2: esquemaCampoImagen,
   imagenGaleria3: esquemaCampoImagen,
+  imagenCliente1: esquemaCampoImagen,
+  imagenCliente2: esquemaCampoImagen,
+  imagenCliente3: esquemaCampoImagen,
+  imagenCliente4: esquemaCampoImagen,
+  imagenCliente5: esquemaCampoImagen,
+  imagenCliente6: esquemaCampoImagen,
 });
 
 export async function actualizarImagenesSitio(

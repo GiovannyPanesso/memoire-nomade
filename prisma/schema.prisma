@@ -184,6 +184,14 @@ model Configuracion {
   imagenGaleria2 String? // Galería foto 2
   imagenGaleria3 String? // Galería foto 3
 
+  // Fotos reales de clientes, para la sección "Momentos reales" del inicio
+  imagenCliente1 String?
+  imagenCliente2 String?
+  imagenCliente3 String?
+  imagenCliente4 String?
+  imagenCliente5 String?
+  imagenCliente6 String?
+
   actualizadoEn DateTime @updatedAt
 
   @@map("configuracion")

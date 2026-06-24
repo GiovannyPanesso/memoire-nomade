@@ -61,6 +61,39 @@ const CAMPOS_IMAGENES: CampoImagen[] = [
   },
 ];
 
+const CAMPOS_FOTOS_CLIENTES: CampoImagen[] = [
+  {
+    clave: "imagenCliente1",
+    titulo: "Foto de cliente 1",
+    descripcion: "Aparece en la sección «Momentos reales» de la página de inicio",
+  },
+  {
+    clave: "imagenCliente2",
+    titulo: "Foto de cliente 2",
+    descripcion: "Aparece en la sección «Momentos reales» de la página de inicio",
+  },
+  {
+    clave: "imagenCliente3",
+    titulo: "Foto de cliente 3",
+    descripcion: "Aparece en la sección «Momentos reales» de la página de inicio",
+  },
+  {
+    clave: "imagenCliente4",
+    titulo: "Foto de cliente 4",
+    descripcion: "Aparece en la sección «Momentos reales» de la página de inicio",
+  },
+  {
+    clave: "imagenCliente5",
+    titulo: "Foto de cliente 5",
+    descripcion: "Aparece en la sección «Momentos reales» de la página de inicio",
+  },
+  {
+    clave: "imagenCliente6",
+    titulo: "Foto de cliente 6",
+    descripcion: "Aparece en la sección «Momentos reales» de la página de inicio",
+  },
+];
+
 interface PropiedadesCloudinary {
   cloudName: string;
   apiKey: string;
@@ -227,6 +260,12 @@ export function FormularioImagenesSitio({
     imagenGaleria1: imagenesIniciales.imagenGaleria1 ?? "",
     imagenGaleria2: imagenesIniciales.imagenGaleria2 ?? "",
     imagenGaleria3: imagenesIniciales.imagenGaleria3 ?? "",
+    imagenCliente1: imagenesIniciales.imagenCliente1 ?? "",
+    imagenCliente2: imagenesIniciales.imagenCliente2 ?? "",
+    imagenCliente3: imagenesIniciales.imagenCliente3 ?? "",
+    imagenCliente4: imagenesIniciales.imagenCliente4 ?? "",
+    imagenCliente5: imagenesIniciales.imagenCliente5 ?? "",
+    imagenCliente6: imagenesIniciales.imagenCliente6 ?? "",
   });
   const [pendiente, iniciarTransicion] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -262,6 +301,28 @@ export function FormularioImagenesSitio({
   return (
     <form onSubmit={manejarEnvio} className="space-y-4">
       {CAMPOS_IMAGENES.map((campo) => (
+        <TarjetaImagen
+          key={campo.clave}
+          titulo={campo.titulo}
+          descripcion={campo.descripcion}
+          valorOriginal={imagenesIniciales[campo.clave] ?? ""}
+          valor={valores[campo.clave]}
+          alCambiar={(valor) => actualizarCampo(campo.clave, valor)}
+          cloudinary={cloudinary}
+        />
+      ))}
+
+      <div className="pt-2">
+        <h3 className="font-serif text-lg text-marca-carbon">
+          Fotos de clientes
+        </h3>
+        <p className="mt-1 text-sm text-marca-gris">
+          Fotos reales de clientes en los tours — aparecen en la sección
+          galería de la página de inicio
+        </p>
+      </div>
+
+      {CAMPOS_FOTOS_CLIENTES.map((campo) => (
         <TarjetaImagen
           key={campo.clave}
           titulo={campo.titulo}

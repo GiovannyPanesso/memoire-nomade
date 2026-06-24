@@ -263,6 +263,18 @@ async function main() {
       "https://res.cloudinary.com/krwc8af8/image/upload/v1782202874/d24f0ef2-db78-4491-8019-211f1124979a_bugnlt.jpg",
     imagenGaleria3:
       "https://res.cloudinary.com/krwc8af8/image/upload/v1782202877/56011bbe-ef52-4fff-823c-5b63e5b6c0ea_lej8k3.jpg",
+    imagenCliente1:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202879/6329eee0-53f9-4247-b2c4-b48af3caf8af_xf3jny.jpg",
+    imagenCliente2:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202872/5b2450ca-d9b9-4469-9a44-986ebf47e734_qpz1u4.jpg",
+    imagenCliente3:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202870/0daa7909-bfe2-47af-aa79-4077c74b9662_p2hcpw.jpg",
+    imagenCliente4:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202868/77e842da-28df-473f-8b57-d7c0f5237d06_g0pvwx.jpg",
+    imagenCliente5:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202866/60555eef-b7dc-410b-a294-d034d2a23ffd_funkmu.jpg",
+    imagenCliente6:
+      "https://res.cloudinary.com/krwc8af8/image/upload/v1782202865/cdbdbae5-51d9-40af-91b1-bc12fe1bcf00_bw1ujw.jpg",
   };
 
   await prisma.configuracion.upsert({
