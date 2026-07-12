@@ -24,20 +24,6 @@ function obtenerEmailsAdmin(): string[] {
   );
 }
 
-/**
- * Extrae message y code de un error de forma segura.
- * JSON.stringify pierde estas propiedades porque son no enumerables en Error,
- * así que hay que sacarlas explícitamente antes de loguear.
- */
-function obtenerDetalleError(error: unknown): { mensajeError: string; codigoError?: string } {
-  if (error instanceof Error) {
-    const posibleCodigo = (error as { code?: unknown }).code;
-    const codigoError = posibleCodigo !== undefined ? String(posibleCodigo) : undefined;
-    return { mensajeError: error.message, codigoError };
-  }
-  return { mensajeError: String(error) };
-}
-
 export async function enviarEmailConfirmacion(datos: DatosEmailReserva): Promise<void> {
   try {
     const [html, pdfReserva] = await Promise.all([
@@ -59,7 +45,7 @@ export async function enviarEmailConfirmacion(datos: DatosEmailReserva): Promise
     });
   } catch (error) {
     logger.error("No se pudo enviar el email de confirmación al cliente", {
-      ...obtenerDetalleError(error),
+      error,
       numero: datos.numero,
     });
   }
@@ -91,7 +77,7 @@ export async function enviarEmailAdmin(datos: DatosEmailReserva): Promise<void> 
     });
   } catch (error) {
     logger.error("No se pudo enviar el email de notificación al admin", {
-      ...obtenerDetalleError(error),
+      error,
       numero: datos.numero,
     });
   }
