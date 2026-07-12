@@ -44,3 +44,6 @@ yarn-error.log*
 # Las migraciones SÍ se suben al repo
 # Solo ignorar archivos generados automáticamente
 /prisma/migrations/**/migration.sql.tmp
+
+.vercel
+.env*

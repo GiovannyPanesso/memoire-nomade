@@ -1,16 +1,17 @@
-import { resend } from "@/lib/emails/resend";
+import { render } from "@react-email/render";
+import { mailer } from "@/lib/mailer";
 import { ConfirmacionCliente } from "@/lib/emails/plantillas/confirmacion-cliente";
 import { NotificacionAdmin } from "@/lib/emails/plantillas/notificacion-admin";
 import { generarPdfReserva, nombreArchivoPdfReserva } from "@/lib/pdf/generar-pdf-reserva";
 import { logger } from "@/lib/logger";
 import type { DatosEmailReserva } from "@/types";
 
-function obtenerEmailRemitente(): string {
-  const email = process.env.RESEND_FROM_EMAIL;
-  if (!email) {
-    throw new Error("Falta la variable de entorno RESEND_FROM_EMAIL.");
+function obtenerRemitente(): string {
+  const usuario = process.env.GMAIL_USER;
+  if (!usuario) {
+    throw new Error("Falta la variable de entorno GMAIL_USER.");
   }
-  return email;
+  return `"Mémoire Nomade" <${usuario}>`;
 }
 
 function obtenerUrlApp(): string {
@@ -23,15 +24,32 @@ function obtenerEmailsAdmin(): string[] {
   );
 }
 
+/**
+ * Extrae message y code de un error de forma segura.
+ * JSON.stringify pierde estas propiedades porque son no enumerables en Error,
+ * así que hay que sacarlas explícitamente antes de loguear.
+ */
+function obtenerDetalleError(error: unknown): { mensajeError: string; codigoError?: string } {
+  if (error instanceof Error) {
+    const posibleCodigo = (error as { code?: unknown }).code;
+    const codigoError = posibleCodigo !== undefined ? String(posibleCodigo) : undefined;
+    return { mensajeError: error.message, codigoError };
+  }
+  return { mensajeError: String(error) };
+}
+
 export async function enviarEmailConfirmacion(datos: DatosEmailReserva): Promise<void> {
   try {
-    const pdfReserva = await generarPdfReserva(datos);
+    const [html, pdfReserva] = await Promise.all([
+      render(ConfirmacionCliente({ datos })),
+      generarPdfReserva(datos),
+    ]);
 
-    await resend.emails.send({
-      from: obtenerEmailRemitente(),
+    await mailer.sendMail({
+      from: obtenerRemitente(),
       to: datos.emailCliente,
       subject: `Reserva confirmada — ${datos.numero}`,
-      react: ConfirmacionCliente({ datos }),
+      html,
       attachments: [
         {
           filename: nombreArchivoPdfReserva(datos.numero),
@@ -41,7 +59,7 @@ export async function enviarEmailConfirmacion(datos: DatosEmailReserva): Promise
     });
   } catch (error) {
     logger.error("No se pudo enviar el email de confirmación al cliente", {
-      error,
+      ...obtenerDetalleError(error),
       numero: datos.numero,
     });
   }
@@ -58,18 +76,22 @@ export async function enviarEmailAdmin(datos: DatosEmailReserva): Promise<void> 
   }
 
   try {
-    await resend.emails.send({
-      from: obtenerEmailRemitente(),
-      to: emailsAdmin,
-      subject: `Nueva reserva — ${datos.numero}`,
-      react: NotificacionAdmin({
+    const html = await render(
+      NotificacionAdmin({
         datos,
         urlReserva: `${obtenerUrlApp()}/admin/reservas/${datos.reservaId}`,
-      }),
+      })
+    );
+
+    await mailer.sendMail({
+      from: obtenerRemitente(),
+      to: emailsAdmin,
+      subject: `Nueva reserva — ${datos.numero}`,
+      html,
     });
   } catch (error) {
     logger.error("No se pudo enviar el email de notificación al admin", {
-      error,
+      ...obtenerDetalleError(error),
       numero: datos.numero,
     });
   }
