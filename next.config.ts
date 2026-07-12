@@ -4,6 +4,12 @@ const RUTAS_PDF_WORKER = [
   "./src/lib/pdf/**",
   "./node_modules/@react-pdf/**",
   "./node_modules/tsx/**",
+  // tsx transforma TypeScript en tiempo de ejecución usando esbuild, pero
+  // esbuild queda hoisteado en su propia carpeta de node_modules (no dentro
+  // de node_modules/tsx). Sin esto, el proceso hijo falla en Vercel con
+  // "Cannot find package 'esbuild'".
+  "./node_modules/esbuild/**",
+  "./node_modules/@esbuild/**",
 ];
 
 const nextConfig: NextConfig = {
