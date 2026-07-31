@@ -1,8 +1,67 @@
 import type { NextConfig } from "next";
 
+// Dependencias no-scoped de @react-pdf/renderer y @react-pdf/font (fuera del
+// glob "@react-pdf/**") resueltas recorriendo el árbol de dependencias real
+// instalado en node_modules — no basta con las directas, hay que arrastrar
+// también las transitivas (p. ej. fontkit → restructure, unicode-trie, etc.).
+const DEPENDENCIAS_REACT_PDF_NO_SCOPED = [
+  "@babel/runtime",
+  "@noble/ciphers",
+  "@noble/hashes",
+  "@swc/helpers",
+  "abs-svg-path",
+  "base64-js",
+  "bidi-js",
+  "brotli",
+  "browserify-zlib",
+  "clone",
+  "color-name",
+  "color-string",
+  "dfa",
+  "emoji-regex-xs",
+  "events",
+  "fast-deep-equal",
+  "fflate",
+  "fontkit",
+  "hsl-to-hex",
+  "hsl-to-rgb-for-reals",
+  "hyphen",
+  "inherits",
+  "is-url",
+  "jay-peg",
+  "js-md5",
+  "js-tokens",
+  "linebreak",
+  "loose-envify",
+  "media-engine",
+  "normalize-svg-path",
+  "object-assign",
+  "pako",
+  "parse-svg-path",
+  "png-js",
+  "postcss-value-parser",
+  "prop-types",
+  "queue",
+  "react-is",
+  "require-from-string",
+  "restructure",
+  "safe-buffer",
+  "scheduler",
+  "string_decoder",
+  "svg-arc-to-cubic-bezier",
+  "tiny-inflate",
+  "tslib",
+  "unicode-properties",
+  "unicode-trie",
+  "util-deprecate",
+  "vite-compatible-readable-stream",
+  "yoga-layout",
+];
+
 const RUTAS_PDF_WORKER = [
   "./src/lib/pdf/**",
   "./node_modules/@react-pdf/**",
+  ...DEPENDENCIAS_REACT_PDF_NO_SCOPED.map((paquete) => `./node_modules/${paquete}/**`),
   "./node_modules/tsx/**",
   // tsx transforma TypeScript en tiempo de ejecución usando esbuild, pero
   // esbuild queda hoisteado en su propia carpeta de node_modules (no dentro

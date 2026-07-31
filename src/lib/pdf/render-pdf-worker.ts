@@ -8,7 +8,10 @@
 // "Objects are not valid as a React child". Generar el PDF en un proceso
 // Node aparte, con su propia resolución de módulos limpia, evita el problema.
 import { renderToBuffer } from "@react-pdf/renderer";
-import { PlantillaPdfReserva } from "@/lib/pdf/plantilla-reserva";
+// Import relativo a propósito: este archivo lo ejecuta tsx directamente (ver
+// generar-pdf-reserva.ts), fuera del bundler de Next, y en el lambda de
+// Vercel no hay tsconfig.json para que tsx resuelva el alias "@/*".
+import { PlantillaPdfReserva } from "./plantilla-reserva";
 import type { DatosEmailReserva } from "@/types";
 
 async function leerEntradaCompleta(): Promise<string> {
