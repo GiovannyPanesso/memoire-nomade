@@ -3,13 +3,32 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { obtenerDatosEmailReservaPorPaymentIntent } from "@/lib/reservas/consultas";
 import { generarPdfReserva, nombreArchivoPdfReserva } from "@/lib/pdf/generar-pdf-reserva";
+import { extraerIpDeCabeceras, verificarLimiteVentana } from "@/lib/seguridad/limite-tasa";
 import { logger } from "@/lib/logger";
 
 const esquemaQuery = z.object({
   paymentIntentId: z.string().min(1),
 });
 
+// La generación de PDF genera un proceso Node por petición: límite bajo
+// aposta para no dejar que se abuse de un endpoint caro en cómputo.
+const LIMITE_PETICIONES_POR_MINUTO = 10;
+const VENTANA_LIMITE_MS = 60 * 1000;
+
 export async function GET(request: NextRequest) {
+  const ip = extraerIpDeCabeceras(request.headers);
+  const limite = await verificarLimiteVentana(
+    `reservas-pdf:${ip}`,
+    LIMITE_PETICIONES_POR_MINUTO,
+    VENTANA_LIMITE_MS
+  );
+  if (!limite.permitido) {
+    return NextResponse.json(
+      { error: "Demasiadas peticiones. Intenta de nuevo en un momento." },
+      { status: 429 }
+    );
+  }
+
   const resultado = esquemaQuery.safeParse(
     Object.fromEntries(request.nextUrl.searchParams)
   );

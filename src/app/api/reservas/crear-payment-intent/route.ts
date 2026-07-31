@@ -6,9 +6,12 @@ import { esFechaPasada } from "@/lib/disponibilidad/fechas";
 import { verificarFechaDisponible } from "@/lib/disponibilidad/consultas";
 import { crearPaymentIntentReserva } from "@/lib/stripe/payment-intent";
 import { codificarCantidadesOpcionales } from "@/lib/reservas/opcionales";
+import { extraerIpDeCabeceras, verificarLimiteVentana } from "@/lib/seguridad/limite-tasa";
 import { logger } from "@/lib/logger";
 
 const LONGITUD_MAXIMA_MENSAJE = 500;
+const LIMITE_PETICIONES_POR_MINUTO = 10;
+const VENTANA_LIMITE_MS = 60 * 1000;
 
 const esquemaCrearPaymentIntent = z.object({
   tourSlug: z.string().min(1, "Falta el tour"),
@@ -24,6 +27,19 @@ const esquemaCrearPaymentIntent = z.object({
 });
 
 export async function POST(request: Request) {
+  const ip = extraerIpDeCabeceras(request.headers);
+  const limite = await verificarLimiteVentana(
+    `crear-payment-intent:${ip}`,
+    LIMITE_PETICIONES_POR_MINUTO,
+    VENTANA_LIMITE_MS
+  );
+  if (!limite.permitido) {
+    return NextResponse.json(
+      { error: "Demasiadas peticiones. Intenta de nuevo en un momento." },
+      { status: 429 }
+    );
+  }
+
   const cuerpoCrudo = await request.json();
   const resultado = esquemaCrearPaymentIntent.safeParse(cuerpoCrudo);
 

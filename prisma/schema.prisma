@@ -166,6 +166,22 @@ model Admin {
 }
 
 // =============================================================================
+// LIMITE TASA
+// Contador de rate limiting (login de admin y endpoints públicos sensibles).
+// La clave codifica el tipo de límite, el sujeto (email/IP) y, para límites de
+// ventana fija, el índice de ventana temporal (ver src/lib/seguridad/limite-tasa.ts)
+// =============================================================================
+
+model LimiteTasa {
+  clave          String    @id
+  intentos       Int       @default(1)
+  bloqueadoHasta DateTime?
+  actualizadoEn  DateTime  @updatedAt
+
+  @@map("limites_tasa")
+}
+
+// =============================================================================
 // CONFIGURACION
 // Ajustes generales del negocio (tabla de una sola fila)
 // =============================================================================

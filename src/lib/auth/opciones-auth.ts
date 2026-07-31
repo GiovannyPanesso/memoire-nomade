@@ -2,6 +2,17 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma/cliente";
+import {
+  estaBloqueado,
+  extraerIpDeCabeceras,
+  limpiarIntentosFallidos,
+  registrarIntentoFallido,
+} from "@/lib/seguridad/limite-tasa";
+import { logger } from "@/lib/logger";
+
+const MAX_INTENTOS_LOGIN = 5;
+const BLOQUEO_LOGIN_MS = 15 * 60 * 1000;
+const DURACION_SESION_SEGUNDOS = 60 * 60 * 8;
 
 export const opcionesAuth: NextAuthOptions = {
   providers: [
@@ -11,8 +22,21 @@ export const opcionesAuth: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Contraseña", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const ip = extraerIpDeCabeceras(req.headers);
+        const claveLimite = `login-admin:${credentials.email.toLowerCase()}:${ip}`;
+
+        const bloqueo = await estaBloqueado(claveLimite);
+        if (!bloqueo.permitido) {
+          logger.error("Login de admin bloqueado por límite de intentos", {
+            email: credentials.email,
+            ip,
+            bloqueadoHasta: bloqueo.bloqueadoHasta,
+          });
           return null;
         }
 
@@ -20,18 +44,16 @@ export const opcionesAuth: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!admin) {
+        const passwordValida = admin
+          ? await bcrypt.compare(credentials.password, admin.passwordHash)
+          : false;
+
+        if (!admin || !passwordValida) {
+          await registrarIntentoFallido(claveLimite, MAX_INTENTOS_LOGIN, BLOQUEO_LOGIN_MS);
           return null;
         }
 
-        const passwordValida = await bcrypt.compare(
-          credentials.password,
-          admin.passwordHash
-        );
-
-        if (!passwordValida) {
-          return null;
-        }
+        await limpiarIntentosFallidos(claveLimite);
 
         return {
           id: admin.id,
@@ -43,6 +65,7 @@ export const opcionesAuth: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: DURACION_SESION_SEGUNDOS,
   },
   pages: {
     signIn: "/admin/login",

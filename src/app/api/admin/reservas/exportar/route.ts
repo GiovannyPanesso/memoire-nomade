@@ -14,11 +14,19 @@ const formatoFecha = new Intl.DateTimeFormat("es-ES", {
   year: "numeric",
 });
 
+// Excel/LibreOffice interpretan una celda que empieza por =, +, - o @ como
+// fórmula. Sin neutralizarlo, un cliente podría reservar con un nombre como
+// "=cmd|'/c calc'!A1" y comprometer la máquina del admin al abrir el CSV.
+function neutralizarFormulaCsv(valor: string): string {
+  return /^[=+\-@\t\r]/.test(valor) ? `'${valor}` : valor;
+}
+
 function escaparCampoCsv(valor: string): string {
-  if (/[",\n]/.test(valor)) {
-    return `"${valor.replace(/"/g, '""')}"`;
+  const valorSeguro = neutralizarFormulaCsv(valor);
+  if (/[",\n]/.test(valorSeguro)) {
+    return `"${valorSeguro.replace(/"/g, '""')}"`;
   }
-  return valor;
+  return valorSeguro;
 }
 
 function construirFilaCsv(reserva: ReservaListado): string {

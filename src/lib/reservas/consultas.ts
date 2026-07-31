@@ -18,6 +18,16 @@ import type {
 
 export const TAMANIO_PAGINA = 20;
 
+// El acceso público por paymentIntentId (confirmación y PDF) existe para que
+// el cliente lo use justo después de pagar, no como enlace de por vida: pasado
+// este plazo desde la creación de la reserva, se trata como si no existiera.
+const DIAS_EXPIRACION_ACCESO_PUBLICO = 90;
+
+function accesoPublicoExpirado(creadoEn: Date): boolean {
+  const limiteMs = DIAS_EXPIRACION_ACCESO_PUBLICO * 24 * 60 * 60 * 1000;
+  return Date.now() - creadoEn.getTime() > limiteMs;
+}
+
 const ESTADOS_VALIDOS = new Set<string>(Object.values(EstadoReserva));
 
 export function parsearFiltrosReservas(
@@ -215,10 +225,10 @@ export async function obtenerConfirmacionReservaPorPaymentIntent(
 ): Promise<ConfirmacionReservaPublica | null> {
   const reserva = await prisma.reserva.findUnique({
     where: { stripePaymentIntentId: paymentIntentId },
-    select: { numero: true, fecha: true, tour: { select: { nombre: true } } },
+    select: { numero: true, fecha: true, creadoEn: true, tour: { select: { nombre: true } } },
   });
 
-  if (!reserva) {
+  if (!reserva || accesoPublicoExpirado(reserva.creadoEn)) {
     return null;
   }
 
@@ -239,7 +249,7 @@ export async function obtenerDatosEmailReservaPorPaymentIntent(
     include: { tour: true },
   });
 
-  if (!reserva) {
+  if (!reserva || accesoPublicoExpirado(reserva.creadoEn)) {
     return null;
   }
 

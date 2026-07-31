@@ -1,0 +1,22 @@
+name: Auditoría de dependencias
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Lunes 08:00 UTC — detecta vulnerabilidades nuevas aunque no haya cambios de código.
+    - cron: "0 8 * * 1"
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
