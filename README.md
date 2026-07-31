@@ -8,7 +8,7 @@ Plataforma de reservas para tours turísticos en París guiados en español. Los
 - **Tailwind CSS** + **shadcn/ui**
 - **Prisma ORM** con **PostgreSQL** en Supabase
 - **Stripe** para pagos (pago completo al reservar)
-- **Resend** para emails transaccionales
+- **Gmail (nodemailer)** para emails transaccionales
 - **NextAuth.js** para autenticación del panel admin
 - **Vercel** para el deploy
 
@@ -106,15 +106,11 @@ Copia el **webhook signing secret** que aparece en consola → `STRIPE_WEBHOOK_S
 
 ---
 
-## Configurar Resend
+## Configurar Gmail
 
-1. Crea una cuenta en [resend.com](https://resend.com)
-2. Ve a **API Keys** y genera una nueva clave → `RESEND_API_KEY`
-3. Ve a **Domains** y añade tu dominio (ej. `memoirenomade.com`)
-4. Añade los registros DNS que indica Resend (SPF, DKIM, DMARC)
-5. Una vez verificado, configura `RESEND_FROM_EMAIL` con un email de ese dominio
-
-> En desarrollo puedes enviar a tu propio email sin verificar dominio usando `onboarding@resend.dev` como remitente.
+1. Activa la verificación en 2 pasos en la cuenta de Gmail que enviará los correos
+2. Genera una contraseña de aplicación en [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+3. Configura `GMAIL_USER` con la dirección de esa cuenta y `GMAIL_APP_PASSWORD` con la contraseña generada
 
 ---
 
