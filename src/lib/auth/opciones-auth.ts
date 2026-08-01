@@ -8,6 +8,7 @@ import {
   limpiarIntentosFallidos,
   registrarIntentoFallido,
 } from "@/lib/seguridad/limite-tasa";
+import { enviarEmailAlertaBloqueoLogin } from "@/lib/emails/enviar-emails";
 import { logger } from "@/lib/logger";
 
 const MAX_INTENTOS_LOGIN = 5;
@@ -49,7 +50,21 @@ export const opcionesAuth: NextAuthOptions = {
           : false;
 
         if (!admin || !passwordValida) {
-          await registrarIntentoFallido(claveLimite, MAX_INTENTOS_LOGIN, BLOQUEO_LOGIN_MS);
+          const resultado = await registrarIntentoFallido(
+            claveLimite,
+            MAX_INTENTOS_LOGIN,
+            BLOQUEO_LOGIN_MS
+          );
+          // Solo se dispara al activarse el bloqueo (no en cada intento
+          // fallido individual), y sin esperar el envío para no retrasar
+          // la respuesta del login.
+          if (!resultado.permitido && resultado.bloqueadoHasta) {
+            void enviarEmailAlertaBloqueoLogin({
+              emailIntentado: credentials.email,
+              ip,
+              bloqueadoHasta: resultado.bloqueadoHasta,
+            });
+          }
           return null;
         }
 
